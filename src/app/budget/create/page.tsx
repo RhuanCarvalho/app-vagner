@@ -6,23 +6,21 @@ import { useParams, useRouter } from "next/navigation";
 import { TitleHeader } from "./title/tile";
 import { users } from "@/fakeData/fakeData";
 import { SubTitle } from "./title/subTitle";
-import { Divider } from "../../../../components/divider/divider";
+import { Divider } from "../../../components/divider/divider";
 import { InputValueServices } from "./input-value-services.tsx/input-values-services";
 import FileUpload from "@/components/addFiles/file-upload";
+import { useCheckin } from "@/services/checkin";
 
 interface BudgetCreatePageProps {
 }
 
 export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const router = useRouter()
-    const params = useParams();
-    const id = params?.id
-
-    const selectUser = users.find(user => user.finishedNumberCell === id);
-    const budget = selectUser?.budgets[0] 
+    const { state: { budget } } = useCheckin()
 
     const handleResponseClick = () => {
-        router.push('/budget/list/1234')
+        // router.push('/budget/list')
+        alert("Em breve!")
     }
 
     return (
@@ -31,7 +29,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                 <HeaderTemplate />
                 <TitleHeader title={budget?.car!} />
                 <div className="w-max px-6 pt-8">
-                    <p className="bg-blue-500 text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.expire}</p>
+                    <p className="bg-blue-500 text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.approval_expires_at}</p>
                 </div>
                 <div>
                     <SubTitle message='Sobre o agendamento' />
@@ -46,7 +44,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                         <Divider />
                         <div className="w-full flex justify-between py-1 items-center">
                             <p>Data</p>
-                            <p>{budget?.prazo}, período da {budget?.periodo}</p>
+                            <p>{budget?.date_schedule}, período da {budget?.periodo}</p>
                         </div>
                         <Divider />
                     </div>
@@ -54,8 +52,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                     <div className="px-6">
                         {budget?.services.map((service, id) => (
                             <div key={id} className="w-full flex justify-between py-1 items-center">
-                                <p>{service.name_service}</p>
-                                <InputValueServices value={service.value} />
+                                <p>{service.service}</p>
+                                <InputValueServices value={Number(service.value)} />
                             </div>
 
                         ))}

@@ -10,9 +10,11 @@ interface VerificationCodeProps {
     title: string;
     subTitle: string;
     setValue: (value: string) => void;
+    clearCode: boolean;
+    setClearCode: (clearCode: boolean) => void;
 }
 
-export default function VerificationCode({ title, subTitle, setValue }: VerificationCodeProps) {
+export default function VerificationCode({ title, subTitle, setValue, clearCode, setClearCode }: VerificationCodeProps) {
     const [code, setCode] = useState<string[]>(["", "", "", ""])
     const inputRefs = [
         useRef<HTMLInputElement>(null),
@@ -22,6 +24,7 @@ export default function VerificationCode({ title, subTitle, setValue }: Verifica
     ]
 
     const handleChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+        setClearCode(false);
         const value = e.target.value
 
         // Only allow numbers
@@ -101,6 +104,12 @@ export default function VerificationCode({ title, subTitle, setValue }: Verifica
     useEffect(() => {
         setValue(completeCode);
     }, [completeCode])
+
+    useEffect(() => {
+        if (clearCode) {
+            setCode(["", "", "", ""]);
+        }
+    }, [clearCode])
 
     return (
         <div className="flex flex-col items-center justify-center p-6 space-y-4">

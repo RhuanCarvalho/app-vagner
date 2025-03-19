@@ -1,4 +1,4 @@
-import { Divider } from "../../../../../components/divider/divider";
+import { Divider } from "../../../../components/divider/divider";
 
 interface SubTitleProps {
     message: string;
