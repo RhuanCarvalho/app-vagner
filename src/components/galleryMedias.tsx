@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogOverlay } from "@/components/ui/dialog"
 
-type MediaItem = {
+export type MediaItem = {
   id: string
-  type: "image" | "video" | "audio" | "pdf" | "other"
-  url: string
-  title?: string
+  media_category: "images" | "videos" | "audios" | "pdfs" | "others"
+  media_play: string
+  media_filename?: string
   thumbnail?: string
 }
 
@@ -181,8 +181,8 @@ export default function MediaGallery({ items, className }: MediaGalleryProps) {
             </div>
 
             {/* Title bar */}
-            {items[currentIndex]?.title && (
-              <div className="p-3 text-sm font-medium bg-background">{items[currentIndex].title}</div>
+            {items[currentIndex]?.media_filename && (
+              <div className="p-3 text-sm font-medium bg-background">{items[currentIndex].media_filename}</div>
             )}
           </div>
         </DialogContent>
@@ -192,46 +192,46 @@ export default function MediaGallery({ items, className }: MediaGalleryProps) {
 }
 
 function MediaRenderer({ item }: { item: MediaItem }) {
-  switch (item.type) {
-    case "image":
+  switch (item.media_category) {
+    case "images":
       return (
         <div className="w-full h-full flex items-center justify-center bg-black">
           <img
-            src={item.url || "/placeholder.svg?height=400&width=600"}
-            alt={item.title || "Image"}
+            src={item.media_play || "/placeholder.svg?height=400&width=600"}
+            alt={item.media_filename || "Image"}
             className="max-w-full max-h-full object-contain"
           />
         </div>
       )
-    case "video":
+    case "videos":
       return (
         <div className="w-full h-full flex items-center justify-center bg-black">
-          <video src={item.url} controls className="max-w-full max-h-full" poster={item.thumbnail} />
+          <video src={item.media_play} controls className="max-w-full max-h-full" poster={item.thumbnail} />
         </div>
       )
-    case "audio":
+    case "audios":
       return (
         <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-muted/50 to-muted p-6">
           <div className="mb-6">
             <Music className="h-24 w-24 text-primary opacity-75" />
           </div>
           <div className="w-full max-w-md">
-            <h3 className="text-lg font-medium text-center mb-4">{item.title || "Áudio"}</h3>
-            <audio src={item.url} controls className="w-full" controlsList="nodownload" />
+            <h3 className="text-lg font-medium text-center mb-4">{item.media_filename || "Áudio"}</h3>
+            <audio src={item.media_play} controls className="w-full" controlsList="nodownload" />
           </div>
         </div>
       )
-    case "pdf":
+    case "pdfs":
       return (
         <div className="w-full h-full flex items-center justify-center bg-muted">
-          <iframe src={item.url} className="w-full h-full" title={item.title || "PDF Document"} />
+          <iframe src={item.media_play} className="w-full h-full" title={item.media_filename || "PDF Document"} />
         </div>
       )
     default:
       return (
         <div className="flex items-center justify-center w-full h-full bg-muted">
           <a
-            href={item.url}
+            href={item.media_play}
             target="_blank"
             rel="noopener noreferrer"
             className="flex flex-col items-center justify-center gap-2 p-4"
@@ -245,23 +245,23 @@ function MediaRenderer({ item }: { item: MediaItem }) {
 }
 
 function ThumbnailRenderer({ item }: { item: MediaItem }) {
-  switch (item.type) {
-    case "image":
+  switch (item.media_category) {
+    case "images":
       return (
         <div className="w-full h-full bg-black">
           <img
-            src={item.url || "/placeholder.svg?height=100&width=100"}
-            alt={item.title || "Thumbnail"}
+            src={item.media_play || "/placeholder.svg?height=100&width=100"}
+            alt={item.media_filename || "Thumbnail"}
             className="w-full h-full object-cover"
           />
         </div>
       )
-    case "video":
+    case "videos":
       return (
         <div className="relative w-full h-full bg-black">
           <img
             src={item.thumbnail || "/placeholder.svg?height=100&width=100"}
-            alt={item.title || "Video thumbnail"}
+            alt={item.media_filename || "Video thumbnail"}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 flex items-center justify-center">
@@ -269,13 +269,13 @@ function ThumbnailRenderer({ item }: { item: MediaItem }) {
           </div>
         </div>
       )
-    case "audio":
+    case "audios":
       return (
         <div className="flex items-center justify-center w-full h-full bg-gradient-to-b from-primary/10 to-primary/20">
           <Music className="h-10 w-10 text-primary" />
         </div>
       )
-    case "pdf":
+    case "pdfs":
       return (
         <div className="flex items-center justify-center w-full h-full bg-muted">
           <FileText className="h-8 w-8 text-primary" />

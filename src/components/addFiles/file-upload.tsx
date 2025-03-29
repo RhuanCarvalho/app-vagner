@@ -2,20 +2,24 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { FileUp, File, ImageIcon, Music, Video, X, Download } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 import { v4 as uuidv4 } from "uuid"
 
-type FileWithPreview = {
+export type FileWithPreview = {
   file: File
   id: string
   preview?: string
 }
 
-export default function FileUpload() {
+interface FileUploadProps {
+  handleFiles: (files: any[]) => void;
+}
+
+export default function FileUpload({ handleFiles }: FileUploadProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([])
   const [previewFile, setPreviewFile] = useState<FileWithPreview | null>(null)
 
@@ -76,6 +80,10 @@ export default function FileUpload() {
   const handleFileClick = (fileData: FileWithPreview) => {
     setPreviewFile(fileData)
   }
+
+  useEffect(()=>{
+    handleFiles(files);
+  }, [files])
 
   const renderPreview = () => {
     if (!previewFile || !previewFile.preview) return null

@@ -1,11 +1,11 @@
 "use client"
-import { useCheckin } from "@/services/checkin"
+import { useAllServices } from "@/services/allServices"
 import { ReactNode } from "react"
 import { InvalidPageAccess } from "../invalidPageAccess/InvalidPageAccess"
 
 export const ProviderAuthCheckin = ({ children }: { children: ReactNode }) => {
 
-    const { state: { authenticated } } = useCheckin();
+    const { state: { authenticated } } = useAllServices();
 
     return (
         <>

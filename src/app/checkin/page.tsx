@@ -3,7 +3,7 @@ import { Container } from "@/components/containers/defaultContainer";
 import { InvalidPageAccess } from "@/components/invalidPageAccess/InvalidPageAccess";
 import Modal from "@/components/modal/modal";
 import VerificationCode from "@/components/verificationCode/verificationCode";
-import { useCheckin } from "@/services/checkin";
+import { useAllServices } from "@/services/allServices";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -13,7 +13,7 @@ export default function CheckinPage() {
 
     const router = useRouter()
 
-    const { actions: { verifyCodeCheckin } } = useCheckin();
+    const { actions: { verifyCodeCheckin } } = useAllServices();
     const searchParams = useSearchParams();
     const company = searchParams.get('company') as string;
     const id = searchParams.get('id') as string;

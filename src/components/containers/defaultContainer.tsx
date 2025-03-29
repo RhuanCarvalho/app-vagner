@@ -11,7 +11,7 @@ export const Container = ({
     className
 }: ContainerProps) => {
     return (
-        <div className="h-full flex justify-center items-center">
+        <div className={twMerge("h-full flex justify-center items-center", className)}>
             <div className={twMerge("h-full w-full sm:max-w-lg", className)}>
                 {children}
             </div>

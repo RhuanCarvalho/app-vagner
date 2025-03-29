@@ -5,15 +5,16 @@ interface InputValueServicesProps {
   onChange?: (value: number) => void;
 }
 
+export const formatCurrency = (value: number) => {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value);
+};
+
 export const InputValueServices = ({ value = 0, onChange }: InputValueServicesProps) => {
   const [inputValue, setInputValue] = useState<number | null>(value || null);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = event.target.value.replace(/\D/g, ""); // Remove tudo que não for número
