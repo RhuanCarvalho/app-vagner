@@ -14,6 +14,7 @@ import MediaGallery, { MediaItem } from "@/components/galleryMedias";
 import { useEffect, useState } from "react";
 import { ConfirmationSendBugdget } from "./confirmSend/confirmSend";
 import { useForm, Controller } from "react-hook-form";
+import dayjs from "dayjs";
 
 type ServiceForm = {
     service: string;
@@ -107,16 +108,17 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             <SubTitle message='Sobre o agendamento' />
                             <div className="px-6">
                                 <div className="w-full flex justify-between py-1 items-center">
-                                    <p className="text-start max-w-[32%]">{budget?.car}</p>
-                                    <p>-</p>
+                                    <p className="text-start max-w-[68%]">{budget?.car}</p>
+                                    {/* <p>-</p> */}
                                     <p className="min-w-max">{budget?.km} KM</p>
-                                    <p>-</p>
-                                    <p className="min-w-max">{budget?.genero} {budget?.idade} anos</p>
+                                    {/* <p>-</p>
+                                    <p className="min-w-max">{budget?.genero} {budget?.idade} anos</p> */}
                                 </div>
                                 <Divider />
                                 <div className="w-full flex justify-between py-1 items-center">
                                     <p>Data</p>
-                                    <p>{budget?.date_schedule}, período da {budget?.periodo}</p>
+                                    {/* <p>{budget?.date_schedule}, período da {budget?.periodo}</p> */}
+                                    <p>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
                                 </div>
                                 <Divider />
                             </div>
