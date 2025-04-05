@@ -27,7 +27,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-opacity-25 backdrop-blur-sm flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-opacity-25 backdrop-blur-sm flex justify-center items-center z-0">
             <div className="bg-white rounded-xl p-6 min-w-max max-w-md shadow-lg relative">
                 <button
                     onClick={onClose}

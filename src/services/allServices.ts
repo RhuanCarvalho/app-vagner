@@ -6,12 +6,13 @@ interface DataVerifyCheckin {
     code: string | null | undefined;
     company: string | null | undefined;
     id: string | null | undefined;
-    type: string | null | undefined;
+    type: string | null | undefined | "estimate" | "schedule";
 }
 
 interface Services {
     service: string;
     value: string;
+    id_service_item: string;
 }
 
 interface Budget {
@@ -32,6 +33,7 @@ interface useCheckinProps {
     state: {
         authenticated: boolean;
         budget: Budget;
+        checkinData: DataVerifyCheckin;
     },
     actions: {
         verifyCodeCheckin: (sendJson: DataVerifyCheckin) => Promise<boolean>;
@@ -44,6 +46,7 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
     state: {
         authenticated: false,
         budget: {} as Budget,
+        checkinData: {} as DataVerifyCheckin,
     },
     actions: {
         verifyCodeCheckin: async (sendJson: DataVerifyCheckin) => {
@@ -55,9 +58,10 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
                         ...state.state,
                         authenticated: data.success,
                         budget: response,
+                        checkinData: sendJson,
                     }
                 }))
-                return true;
+                return data.success;
             } catch (err) {
                 return false;
             }

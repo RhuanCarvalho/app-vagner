@@ -15,6 +15,9 @@ import { useEffect, useState } from "react";
 import { ConfirmationSendBugdget } from "./confirmSend/confirmSend";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
+import { Button } from "@/components/ui/button";
+import { Cog, CalendarPlus, X } from "lucide-react"
+import { ModalAddDate } from "./modalAddDate/modalAddDate";
 
 type ServiceForm = {
     service: string;
@@ -31,7 +34,7 @@ interface BudgetCreatePageProps {
 
 export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const router = useRouter()
-    const { state: { budget }, actions: { sendBudget } } = useAllServices()
+    const { state: { budget, checkinData }, actions: { sendBudget } } = useAllServices()
     const [files, setFiles] = useState<FileWithPreview[]>([])
     const handleFiles = (files: FileWithPreview[]) => setFiles(files);
     const [ok, setOk] = useState(false);
@@ -64,9 +67,28 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         }
     }, [budget, setValue]);
 
+    const [openAddDate, setOpenAddDate] = useState(false);
+    const handleAddDateOpen = () => {
+        setOpenAddDate(true)
+    };
+    const handleAddDateClose = () => {
+        setOpenAddDate(false);
+    };
+
+
+    const [newDate, setNewDate] = useState<any | undefined>();
+    const handleDateChange = (newDate: any) => {
+        setNewDate(newDate);
+    };
+
 
     const handleResponseClick = async () => {
         const formData = new FormData();
+
+        // Add sugestão de data caso esteja preenchida
+        if (!!newDate) {
+            formData.append("suggested_date", JSON.stringify(newDate));
+        }
 
         // Adicionar os serviços como um JSON stringificado
         formData.append("services", JSON.stringify(services));
@@ -83,7 +105,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
         if (isValid) {
             setOk(true);
-        }else {
+        } else {
             alert('Houve um erro, tente novamente!')
         }
 
@@ -120,6 +142,44 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     {/* <p>{budget?.date_schedule}, período da {budget?.periodo}</p> */}
                                     <p>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
                                 </div>
+                                {
+                                // checkinData.type === "estimate" && (
+                                    !newDate ?
+                                        <div className="pt-4">
+                                            <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
+                                                <span>
+                                                    <CalendarPlus className="mr-2 h-4 w-4" />
+                                                    Sugerir data
+                                                </span>
+                                            </Button>
+                                        </div>
+                                        :
+                                        <div className="mt-4 flex items-center justify-between gap-2 rounded-md border p-2 text-sm">
+                                            <div className="w-full flex justify-between">
+                                                <div className=" text-green-500 flex h-8 items-center rounded-md bg-muted">
+                                                    Sugestão de nova data:
+                                                </div>
+                                                <div className="min-w-0 flex flex-col items-center justify-end">
+                                                    <p className="text-green-500 truncate font-medium">{newDate.date}</p>
+                                                    <p className="text-green-500 text-xs text-muted-foreground font-medium">período da {newDate.period}</p>
+                                                </div>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="h-8 w-8 p-0 cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation()
+                                                    setNewDate(undefined);
+                                                    // removeFile(fileData.id)
+                                                }}
+                                            >
+                                                <X className="h-4 w-4" />
+                                                <span className="sr-only">Remover arquivo</span>
+                                            </Button>
+                                        </div>
+                                // )
+                                }
                                 <Divider />
                             </div>
                             <SubTitle message='Serviços' />
@@ -148,6 +208,16 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                         <p>{formatCurrency(total)}</p>
                                     </div>
                                 </div>
+                                {/* {checkinData.type === "estimate" && */}
+                                    <div className="pt-2">
+                                        <Button variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
+                                            <span>
+                                                <Cog className="mr-2 h-4 w-4" />
+                                                Adicionar serviços
+                                            </span>
+                                        </Button>
+                                    </div>
+                                {/* } */}
                             </div>
                             <div>
                                 <SubTitle message='Medias' />
@@ -182,6 +252,14 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     Responder
                                 </button>
                             </div>
+                            <div className="flex justify-center items-center p-2">
+                                <button
+                                    onClick={()=>{}}
+                                    className="transition-all w-[60%] bg-red-500 rounded-full active:scale-105 active:bg-red-600 hover:bg-red-600 cursor-pointer text-white text-medium font-bold py-2 px-4"
+                                >
+                                    Declinar
+                                </button>
+                            </div>
                         </div>
 
                     </>
@@ -189,6 +267,11 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                     <ConfirmationSendBugdget onClick={viewListBudgets} />
                 }
             </div>
+            <ModalAddDate
+                isOpen={openAddDate}
+                onClose={handleAddDateClose}
+                saveInfo={handleDateChange}
+            />
         </Container>
     )
 }
