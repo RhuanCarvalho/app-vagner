@@ -29,6 +29,11 @@ interface Budget {
     media: MediaItem[];
 }
 
+interface DataRejectedBudget {
+    id: string;
+    type: string;
+}
+
 interface useCheckinProps {
     state: {
         authenticated: boolean;
@@ -38,6 +43,7 @@ interface useCheckinProps {
     actions: {
         verifyCodeCheckin: (sendJson: DataVerifyCheckin) => Promise<boolean>;
         sendBudget: (sendJson: any) => Promise<boolean>;
+        RejectedService: (sendJson: DataRejectedBudget) => Promise<void>;
     }
 }
 
@@ -80,6 +86,12 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
             catch (err) {
                 return false;
             }
+        },
+        RejectedService: async (sendJson: DataRejectedBudget) => {
+            try {
+                const { data } = await api.post('/i/index.php/company/estimate_reject', sendJson);
+                console.log(data);
+            } catch (err) { }
         } 
     }
 }))

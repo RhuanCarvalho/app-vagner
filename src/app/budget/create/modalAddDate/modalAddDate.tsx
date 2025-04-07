@@ -35,19 +35,24 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo }: ModalAddDateProps) =
         }
 
         setError(null);
-        console.log('Data selecionada:', selectedDate);
-        console.log('Período selecionado:', selectedPeriod);
         saveInfo({ date: dayjs(selectedDate).format('DD/MM/YYYY'), period: selectedPeriod });
         setSelectedDate(null);
         setSelectedPeriod(null);
         onClose();
-
     };
+    
+    const closeInX = () => {
+        setSelectedDate(null);
+        setSelectedPeriod(null);
+        onClose();
+    }
+
+
     return (
         <>
             <Modal
                 isOpen={isOpen}
-                onClose={onClose}
+                onClose={closeInX}
             >
                 <div className="w-full p-2 pt-4 flex flex-col justify-center items-center gap-4 ">
                     <SubTitle message='Sugerir Data' />
@@ -66,7 +71,7 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo }: ModalAddDateProps) =
                         onChange={setSelectedPeriod}
                     />
                     {error && (
-                        <p className="text-red-500 text-sm font-medium">
+                        <p className="text-red-500 text-sm font-medium max-w-[216] text-center">
                             {error}
                         </p>
                     )}

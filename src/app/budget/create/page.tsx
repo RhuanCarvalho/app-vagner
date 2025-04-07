@@ -2,26 +2,30 @@
 
 import { Container } from "@/components/containers/defaultContainer";
 import { HeaderTemplate } from "@/components/header/header";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { TitleHeader } from "./title/tile";
-import { users } from "@/fakeData/fakeData";
 import { SubTitle } from "./title/subTitle";
 import { Divider } from "../../../components/divider/divider";
 import { formatCurrency, InputValueServices } from "./input-value-services.tsx/input-values-services";
 import FileUpload, { FileWithPreview } from "@/components/addFiles/file-upload";
 import { useAllServices } from "@/services/allServices";
-import MediaGallery, { MediaItem } from "@/components/galleryMedias";
+import MediaGallery from "@/components/galleryMedias";
 import { useEffect, useState } from "react";
 import { ConfirmationSendBugdget } from "./confirmSend/confirmSend";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
-import { Cog, CalendarPlus, X } from "lucide-react"
+import { Cog, CalendarPlus, X, Trash2 } from "lucide-react"
 import { ModalAddDate } from "./modalAddDate/modalAddDate";
+import { ModalAddService } from "./modalAddService/modalAddService";
+import { ModalConfirmeDecline } from "./confirmDecline/confirmDecline";
+import { ConfirmDeclineBugdget } from "./messageDecline/messageDecline";
 
 type ServiceForm = {
     service: string;
     value: number;
+    id_service_item: string;
+    isNew?: boolean;
 };
 
 type BudgetForm = {
@@ -34,7 +38,7 @@ interface BudgetCreatePageProps {
 
 export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const router = useRouter()
-    const { state: { budget, checkinData }, actions: { sendBudget } } = useAllServices()
+    const { state: { budget, checkinData }, actions: { sendBudget, RejectedService } } = useAllServices()
     const [files, setFiles] = useState<FileWithPreview[]>([])
     const handleFiles = (files: FileWithPreview[]) => setFiles(files);
     const [ok, setOk] = useState(false);
@@ -81,6 +85,21 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         setNewDate(newDate);
     };
 
+    const [openAddService, setOpenAddService] = useState(false);
+    const handleAddServiceOpen = () => {
+        setOpenAddService(true)
+    };
+    const handleAddServiceClose = () => {
+        setOpenAddService(false);
+    };
+    const handleServiceChange = (newService: any) => {
+      setValue("services", [...services, newService]);
+    };
+
+    const removeServiceItem = (id: string) => {
+        setValue("services", services.filter(service => service.id_service_item!== id));
+    }
+
 
     const handleResponseClick = async () => {
         const formData = new FormData();
@@ -95,6 +114,9 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
         // Adicionar o campo adicional
         formData.append("additionalInfo", additionalInfo);
+        formData.append("type", checkinData.type!);
+        formData.append("id", checkinData.id!);
+        formData.append("company", checkinData.company!);
 
         // Adicionar os arquivos ao FormData
         files.forEach((file, index) => {
@@ -110,6 +132,26 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         }
 
     };
+
+    const [ isDecline, setIsDecline ] = useState(false);
+    const [ confirmDecline, setConfirmDecline ] = useState(false);
+    const handleConfirmDeclineOpen = () => {
+        setConfirmDecline(true)
+    };
+    const handleConfirmDeclineClose = () => {
+        setConfirmDecline(false);
+    };
+    
+
+    const rejectedBudget = () => {
+        RejectedService({
+            id: checkinData.id!,
+            type: checkinData.type!,
+        })
+        setOk(true);
+        setIsDecline(true);
+    }
+
 
     const viewListBudgets = () => {
         router.push('/budget/list/1234');
@@ -186,7 +228,11 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             <div className="px-6">
                                 {services.map((service, index) => (
                                     <div key={index} className="w-full flex justify-between py-1 items-center">
-                                        <p>{service.service}</p>
+                                        { service.isNew 
+                                            ?<span onClick={()=>removeServiceItem(service.id_service_item)} ><Trash2 className="mr-2 h-4 w-4 text-start text-red-500 cursor-pointer"/></span>
+                                            :<span><p className=" h-4 text-red-500"/></span>
+                                        }
+                                        <p className={`text-start w-full`}>{service.service}</p>
                                         <Controller
                                             control={control}
                                             name={`services.${index}.value`}
@@ -210,7 +256,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 </div>
                                 {/* {checkinData.type === "estimate" && */}
                                     <div className="pt-2">
-                                        <Button variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
+                                        <Button onClick={handleAddServiceOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
                                             <span>
                                                 <Cog className="mr-2 h-4 w-4" />
                                                 Adicionar serviços
@@ -254,7 +300,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             </div>
                             <div className="flex justify-center items-center p-2">
                                 <button
-                                    onClick={()=>{}}
+                                    onClick={handleConfirmDeclineOpen}
                                     className="transition-all w-[60%] bg-red-500 rounded-full active:scale-105 active:bg-red-600 hover:bg-red-600 cursor-pointer text-white text-medium font-bold py-2 px-4"
                                 >
                                     Declinar
@@ -263,14 +309,26 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                         </div>
 
                     </>
-                    :
-                    <ConfirmationSendBugdget onClick={viewListBudgets} />
+                    : 
+                    isDecline 
+                    ? <ConfirmDeclineBugdget onClick={viewListBudgets} />
+                    : <ConfirmationSendBugdget onClick={viewListBudgets} />
                 }
             </div>
             <ModalAddDate
                 isOpen={openAddDate}
                 onClose={handleAddDateClose}
                 saveInfo={handleDateChange}
+            />
+            <ModalAddService
+                isOpen={openAddService}
+                onClose={handleAddServiceClose}
+                saveInfo={handleServiceChange}
+            />
+            <ModalConfirmeDecline
+                isOpen={confirmDecline}
+                onClose={handleConfirmDeclineClose}
+                onFunction={rejectedBudget}
             />
         </Container>
     )
