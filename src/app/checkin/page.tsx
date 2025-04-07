@@ -70,7 +70,7 @@ export default function CheckinPage() {
                 :
                 <Container className="bg-[#000E1B]">
                     <div className="flex flex-col gap-14 pt-14 items-center">
-                        <img src="./capacete.svg" alt="" />
+                        <img src="/painel/link/capacete.svg" alt="" />
                         <div className="flex flex-col items-center bg-white w-[80%] h-[300px] rounded-xl">
                             <VerificationCode
                                 title="Digite seu código de acesso"

@@ -89,7 +89,7 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
         },
         RejectedService: async (sendJson: DataRejectedBudget) => {
             try {
-                const { data } = await api.post('/i/index.php/company/estimate_reject', sendJson);
+                const { data } = await api.post('/copiloto/index.php/company/estimate_reject ', sendJson);
                 console.log(data);
             } catch (err) { }
         } 
