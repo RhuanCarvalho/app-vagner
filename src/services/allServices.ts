@@ -88,6 +88,9 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
                         },
                     }
                 );
+                if (data.message){
+                    set((state)=> ({state: { ...state.state, retornoMessageAPI: data.message}}))
+                }
                 return true;
             }
             catch (err) {
