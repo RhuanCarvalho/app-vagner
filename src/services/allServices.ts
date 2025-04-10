@@ -39,11 +39,13 @@ interface useCheckinProps {
         authenticated: boolean;
         budget: Budget;
         checkinData: DataVerifyCheckin;
+        retornoMessageAPI: string;
     },
     actions: {
         verifyCodeCheckin: (sendJson: DataVerifyCheckin) => Promise<boolean>;
         sendBudget: (sendJson: any) => Promise<boolean>;
         RejectedService: (sendJson: DataRejectedBudget) => Promise<void>;
+        cleanMessage: () => void;
     }
 }
 
@@ -53,12 +55,17 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
         authenticated: false,
         budget: {} as Budget,
         checkinData: {} as DataVerifyCheckin,
+        retornoMessageAPI: '',
     },
     actions: {
+        cleanMessage: () => set((state)=>({state: { ...state.state, retornoMessageAPI: ''}})),
         verifyCodeCheckin: async (sendJson: DataVerifyCheckin) => {
             try {
                 const { data } = await api.post('/copiloto/index.php/company/validate_code', sendJson);
                 const response = data.data as Budget;
+                if (data.message){
+                    set((state)=> ({state: { ...state.state, retornoMessageAPI: data.message}}))
+                }
                 set((state) => ({
                     state: {
                         ...state.state,
@@ -90,6 +97,9 @@ export const useAllServices = create<useCheckinProps>((set, get) => ({
         RejectedService: async (sendJson: DataRejectedBudget) => {
             try {
                 const { data } = await api.post('/copiloto/index.php/company/estimate_reject ', sendJson);
+                if (data.message){
+                    set((state)=> ({state: { ...state.state, retornoMessageAPI: data.message}}))
+                }
                 console.log(data);
             } catch (err) { }
         } 

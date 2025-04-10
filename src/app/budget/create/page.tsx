@@ -15,11 +15,12 @@ import { ConfirmationSendBugdget } from "./confirmSend/confirmSend";
 import { useForm, Controller } from "react-hook-form";
 import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
-import { Cog, CalendarPlus, X, Trash2 } from "lucide-react"
+import { PackagePlus, CalendarPlus, X, Trash2 } from "lucide-react"
 import { ModalAddDate } from "./modalAddDate/modalAddDate";
 import { ModalAddService } from "./modalAddService/modalAddService";
 import { ModalConfirmeDecline } from "./confirmDecline/confirmDecline";
 import { ConfirmDeclineBugdget } from "./messageDecline/messageDecline";
+import "./style.css";
 
 type ServiceForm = {
     service: string;
@@ -80,7 +81,10 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     };
 
 
-    const [newDate, setNewDate] = useState<any | undefined>();
+    const [newDate, setNewDate] = useState<{
+        suggestions: { date: string; period: string }[];
+        observation: string;
+    }>({ suggestions: [], observation: '' });
     const handleDateChange = (newDate: any) => {
         setNewDate(newDate);
     };
@@ -93,11 +97,11 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         setOpenAddService(false);
     };
     const handleServiceChange = (newService: any) => {
-      setValue("services", [...services, newService]);
+        setValue("services", [...services, newService]);
     };
 
     const removeServiceItem = (id: string) => {
-        setValue("services", services.filter(service => service.id_service_item!== id));
+        setValue("services", services.filter(service => service.id_service_item !== id));
     }
 
 
@@ -106,7 +110,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
         // Add sugestão de data caso esteja preenchida
         if (!!newDate) {
-            formData.append("suggested_date", JSON.stringify(newDate));
+            formData.append("suggested_dates", JSON.stringify(newDate));
         }
 
         // Adicionar os serviços como um JSON stringificado
@@ -133,15 +137,15 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
     };
 
-    const [ isDecline, setIsDecline ] = useState(false);
-    const [ confirmDecline, setConfirmDecline ] = useState(false);
+    const [isDecline, setIsDecline] = useState(false);
+    const [confirmDecline, setConfirmDecline] = useState(false);
     const handleConfirmDeclineOpen = () => {
         setConfirmDecline(true)
     };
     const handleConfirmDeclineClose = () => {
         setConfirmDecline(false);
     };
-    
+
 
     const rejectedBudget = () => {
         RejectedService({
@@ -156,6 +160,13 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const viewListBudgets = () => {
         router.push('/budget/list/1234');
     }
+
+    const [highlightFirstInput, setHighlightFirstInput] = useState(true);
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setHighlightFirstInput(false), 60000);
+        return () => clearTimeout(timeout);
+    }, []);
 
     return (
         <Container>
@@ -185,42 +196,64 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     <p>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
                                 </div>
                                 {
-                                // checkinData.type === "estimate" && (
-                                    !newDate ?
-                                        <div className="pt-4">
-                                            <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
-                                                <span>
-                                                    <CalendarPlus className="mr-2 h-4 w-4" />
-                                                    Sugerir data
-                                                </span>
-                                            </Button>
-                                        </div>
-                                        :
-                                        <div className="mt-4 flex items-center justify-between gap-2 rounded-md border p-2 text-sm">
-                                            <div className="w-full flex justify-between">
-                                                <div className=" text-green-500 flex h-8 items-center rounded-md bg-muted">
-                                                    Sugestão de nova data:
+                                    newDate?.suggestions?.map((date: { date: string, period: string }, index: any) => {
+                                        return (
+                                            <div key={index} className="mt-4 flex items-center justify-between gap-2 rounded-md border p-2 text-sm">
+                                                <div className="w-full flex justify-between">
+                                                    <div className=" text-green-500 flex h-8 items-center rounded-md bg-muted">
+                                                        Sugestão de nova data:
+                                                    </div>
+                                                    <div className="min-w-0 flex flex-col items-center justify-end">
+                                                        <p className="text-green-500 truncate font-medium">{date.date}</p>
+                                                        <p className="text-green-500 text-xs text-muted-foreground font-medium">período da {date.period}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="min-w-0 flex flex-col items-center justify-end">
-                                                    <p className="text-green-500 truncate font-medium">{newDate.date}</p>
-                                                    <p className="text-green-500 text-xs text-muted-foreground font-medium">período da {newDate.period}</p>
-                                                </div>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-8 w-8 p-0 cursor-pointer"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setNewDate((prev: any) => ({
+                                                            ...prev,
+                                                            suggestions: prev.suggestions.filter((_: any, i: any) => i !== index)
+                                                        }));
+                                                        if (newDate?.suggestions.length == 1) {
+                                                            setNewDate((prev: any) => ({
+                                                                ...prev,
+                                                                observation: ''
+                                                            }));
+                                                        }
+                                                    }}
+                                                >
+                                                    <X className="h-4 w-4" />
+                                                    <span className="sr-only">Remover arquivo</span>
+                                                </Button>
                                             </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-8 w-8 p-0 cursor-pointer"
-                                                onClick={(e) => {
-                                                    e.stopPropagation()
-                                                    setNewDate(undefined);
-                                                    // removeFile(fileData.id)
-                                                }}
-                                            >
-                                                <X className="h-4 w-4" />
-                                                <span className="sr-only">Remover arquivo</span>
-                                            </Button>
+                                        )
+                                    })
+                                    // )
+                                }
+                                {newDate?.observation &&
+                                    <div className="mt-4 flex items-center justify-between gap-2 rounded-md p-2 text-sm">
+                                        <div className="w-full flex justify-between">
+                                            <div className="min-w-0 flex flex-col items-center justify-end">
+                                                <p className="w-full text-green-500 truncate font-medium text-start">Observação:</p>
+                                                <p className="w-full text-start text-green-500 text-xs text-muted-foreground font-medium p-2">{newDate?.observation}</p>
+                                            </div>
                                         </div>
-                                // )
+                                    </div>
+
+                                }
+                                {(newDate.suggestions?.length < 3) &&
+                                    <div className="pt-4">
+                                        <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
+                                            <span>
+                                                <CalendarPlus className="mr-2 h-4 w-4" />
+                                                Sugerir data
+                                            </span>
+                                        </Button>
+                                    </div>
                                 }
                                 <Divider />
                             </div>
@@ -228,9 +261,9 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             <div className="px-6">
                                 {services.map((service, index) => (
                                     <div key={index} className="w-full flex justify-between py-1 items-center">
-                                        { service.isNew 
-                                            ?<span onClick={()=>removeServiceItem(service.id_service_item)} ><Trash2 className="mr-2 h-4 w-4 text-start text-red-500 cursor-pointer"/></span>
-                                            :<span><p className=" h-4 text-red-500"/></span>
+                                        {service.isNew
+                                            ? <span onClick={() => removeServiceItem(service.id_service_item)} ><Trash2 className="mr-2 h-4 w-4 text-start text-red-500 cursor-pointer" /></span>
+                                            : <span><p className=" h-4 text-red-500" /></span>
                                         }
                                         <p className={`text-start w-full`}>{service.service}</p>
                                         <Controller
@@ -239,8 +272,12 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                             render={({ field }) => (
                                                 <InputValueServices
                                                     {...field}
-                                                    value={Number(field.value) || 0} // Converte o valor para número
-                                                    onChange={(e) => field.onChange(Number(e))} // Garante que o estado armazene um número
+                                                    className={`${index === 0 && highlightFirstInput ? "jump p-1 bg-slate-100 rounded-lg" : ""}`}
+                                                    value={Number(field.value) || 0}
+                                                    onChange={(e) => {
+                                                        field.onChange(e)
+                                                    }}
+                                                    onFocus={()=>setHighlightFirstInput(false)}
                                                 />
                                             )}
                                         />
@@ -255,14 +292,14 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     </div>
                                 </div>
                                 {/* {checkinData.type === "estimate" && */}
-                                    <div className="pt-2">
-                                        <Button onClick={handleAddServiceOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
-                                            <span>
-                                                <Cog className="mr-2 h-4 w-4" />
-                                                Adicionar serviços
-                                            </span>
-                                        </Button>
-                                    </div>
+                                <div className="pt-2">
+                                    <Button onClick={handleAddServiceOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
+                                        <span>
+                                            <PackagePlus className="mr-2 h-4 w-4" />
+                                            Adicionar serviços
+                                        </span>
+                                    </Button>
+                                </div>
                                 {/* } */}
                             </div>
                             <div>
@@ -309,16 +346,17 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                         </div>
 
                     </>
-                    : 
-                    isDecline 
-                    ? <ConfirmDeclineBugdget onClick={viewListBudgets} />
-                    : <ConfirmationSendBugdget onClick={viewListBudgets} />
+                    :
+                    isDecline
+                        ? <ConfirmDeclineBugdget onClick={viewListBudgets} />
+                        : <ConfirmationSendBugdget onClick={viewListBudgets} />
                 }
             </div>
             <ModalAddDate
                 isOpen={openAddDate}
                 onClose={handleAddDateClose}
                 saveInfo={handleDateChange}
+                info={newDate}
             />
             <ModalAddService
                 isOpen={openAddService}

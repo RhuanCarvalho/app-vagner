@@ -13,7 +13,7 @@ export default function CheckinPage() {
 
     const router = useRouter()
 
-    const { actions: { verifyCodeCheckin } } = useAllServices();
+    const { state: { retornoMessageAPI }, actions: { verifyCodeCheckin, cleanMessage } } = useAllServices();
     const searchParams = useSearchParams();
     const company = searchParams.get('company') as string;
     const id = searchParams.get('id') as string;
@@ -58,6 +58,7 @@ export default function CheckinPage() {
     }
 
     const handleCloseModalInvalidCode = () => {
+        cleanMessage();
         setInvalidCode(false);
         setClearCode(true);
     }
@@ -96,6 +97,7 @@ export default function CheckinPage() {
             >
                 <div className="w-full p-2 pt-4 flex flex-col justify-center items-center gap-4 ">
                     <p className="font-semibold">Codigo Inválido!</p>
+                    <span className="font-semibold text-[10px] max-w-[264px] text-center">{retornoMessageAPI}</span>
                     <button
                         className={`
                             cursor-pointer 

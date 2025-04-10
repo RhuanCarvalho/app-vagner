@@ -1,3 +1,4 @@
+import { useAllServices } from "@/services/allServices";
 
 interface ConfirmDeclineBugdgetProps {
     onClick?: () => void;
@@ -5,9 +6,11 @@ interface ConfirmDeclineBugdgetProps {
 
 
 export const ConfirmDeclineBugdget = ({ onClick }: ConfirmDeclineBugdgetProps) => {
+
+    const { state: { retornoMessageAPI }} = useAllServices();
     return (
         <div className="w-full pt-36 flex flex-col items-center justify-center">
-            <p className="text-2xl font-bold text-center">Ok! Esse orçamento foi Declinado!</p>
+            <p className="text-2xl font-bold text-center">{!!retornoMessageAPI ? retornoMessageAPI : "Recebemos a sua confirmação, obrigado!"}</p>
             <div className="w-full flex justify-center items-center pt-20">
                 <button
                     onClick={onClick}
