@@ -21,6 +21,7 @@ import { ModalAddService } from "./modalAddService/modalAddService";
 import { ModalConfirmeDecline } from "./confirmDecline/confirmDecline";
 import { ConfirmDeclineBugdget } from "./messageDecline/messageDecline";
 import "./style.css";
+import CustomCheckbox from "@/components/customCheckbox/customCheckboxConfirmDate";
 
 type ServiceForm = {
     service: string;
@@ -104,8 +105,16 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         setValue("services", services.filter(service => service.id_service_item !== id));
     }
 
+    const [isCheckedDate, setIsCheckedDate] = useState(false);
+    const [activeWarningNoConfirmDate, setActiveWarningNoConfirmDate] = useState(false);
 
     const handleResponseClick = async () => {
+
+        if (!isCheckedDate){
+            setActiveWarningNoConfirmDate(true);
+            return;
+        }
+
         const formData = new FormData();
 
         // Add sugestão de data caso esteja preenchida
@@ -168,6 +177,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         return () => clearTimeout(timeout);
     }, []);
 
+
     return (
         <Container>
             <div>
@@ -193,42 +203,46 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 <div className="w-full flex justify-between py-1 items-center">
                                     <p>Data</p>
                                     {/* <p>{budget?.date_schedule}, período da {budget?.periodo}</p> */}
-                                    <p>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
+                                    <p className={`${(isCheckedDate && newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
                                 </div>
                                 {
                                     newDate?.suggestions?.map((date: { date: string, period: string }, index: any) => {
                                         return (
                                             <div key={index} className="mt-4 flex items-center justify-between gap-2 rounded-md border p-2 text-sm">
                                                 <div className="w-full flex justify-between">
-                                                    <div className=" text-green-500 flex h-8 items-center rounded-md bg-muted">
+                                                    <div className=" text-emerald-400 flex h-8 items-center rounded-md bg-muted">
                                                         Sugestão de nova data:
                                                     </div>
                                                     <div className="min-w-0 flex flex-col items-center justify-end">
-                                                        <p className="text-green-500 truncate font-medium">{date.date}</p>
-                                                        <p className="text-green-500 text-xs text-muted-foreground font-medium">período da {date.period}</p>
+                                                        <p className="text-emerald-400 truncate font-medium">{date.date}</p>
+                                                        <p className="text-emerald-400 text-xs text-muted-foreground font-medium">período da {date.period}</p>
                                                     </div>
                                                 </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="h-8 w-8 p-0 cursor-pointer"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setNewDate((prev: any) => ({
-                                                            ...prev,
-                                                            suggestions: prev.suggestions.filter((_: any, i: any) => i !== index)
-                                                        }));
-                                                        if (newDate?.suggestions.length == 1) {
+                                                {!isCheckedDate ?
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 w-8 p-0 cursor-pointer"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
                                                             setNewDate((prev: any) => ({
                                                                 ...prev,
-                                                                observation: ''
+                                                                suggestions: prev.suggestions.filter((_: any, i: any) => i !== index)
                                                             }));
-                                                        }
-                                                    }}
-                                                >
-                                                    <X className="h-4 w-4" />
-                                                    <span className="sr-only">Remover arquivo</span>
-                                                </Button>
+                                                            if (newDate?.suggestions.length == 1) {
+                                                                setNewDate((prev: any) => ({
+                                                                    ...prev,
+                                                                    observation: ''
+                                                                }));
+                                                            }
+                                                        }}
+                                                    >
+                                                        <X className="h-4 w-4" />
+                                                        <span className="sr-only">Remover arquivo</span>
+                                                    </Button>
+                                                    : <div className="w-8"></div>
+
+                                                }
                                             </div>
                                         )
                                     })
@@ -238,23 +252,26 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     <div className="mt-4 flex items-center justify-between gap-2 rounded-md p-2 text-sm">
                                         <div className="w-full flex justify-between">
                                             <div className="min-w-0 flex flex-col items-center justify-end">
-                                                <p className="w-full text-green-500 truncate font-medium text-start">Observação:</p>
-                                                <p className="w-full text-start text-green-500 text-xs text-muted-foreground font-medium p-2">{newDate?.observation}</p>
+                                                <p className="w-full text-emerald-400 truncate font-medium text-start">Observação:</p>
+                                                <p className="w-full text-start text-emerald-400 text-xs text-muted-foreground font-medium p-2">{newDate?.observation}</p>
                                             </div>
                                         </div>
                                     </div>
 
                                 }
-                                {(newDate.suggestions?.length < 3) &&
-                                    <div className="pt-4">
-                                        <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
-                                            <span>
-                                                <CalendarPlus className="mr-2 h-4 w-4" />
-                                                Sugerir data
-                                            </span>
-                                        </Button>
-                                    </div>
-                                }
+                                <div className="w-full pt-4 flex justify-between items-start">
+                                    <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={setIsCheckedDate} />
+
+                                    {(
+                                        isCheckedDate 
+                                        // || newDate.suggestions.length >= 3
+                                        ) ? <div className="h-1"></div> : <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="mt-1 w-[40%] cursor-pointer" type="button" asChild>
+                                        <span>
+                                            <CalendarPlus className="mr-2 h-4 w-4" />
+                                            Sugerir data
+                                        </span>
+                                    </Button>}
+                                </div>
                                 <Divider />
                             </div>
                             <SubTitle message='Serviços' />
@@ -277,7 +294,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                                     onChange={(e) => {
                                                         field.onChange(e)
                                                     }}
-                                                    onFocus={()=>setHighlightFirstInput(false)}
+                                                    onFocus={() => setHighlightFirstInput(false)}
                                                 />
                                             )}
                                         />
@@ -303,7 +320,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 {/* } */}
                             </div>
                             <div>
-                                <SubTitle message='Medias' />
+                                <SubTitle message='Mídias' />
                                 <div className="px-6">
                                     <MediaGallery items={budget.media} />
                                 </div>
@@ -335,6 +352,14 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     Responder
                                 </button>
                             </div>
+
+                            {
+                                (activeWarningNoConfirmDate && !isCheckedDate) &&
+                                <p className="text-red-500 text-sm font-medium w-full text-center py-4">
+                                    Para prosseguir é necessário confirmar a data!
+                                </p>
+                                }
+
                             <div className="flex justify-center items-center p-2">
                                 <button
                                     onClick={handleConfirmDeclineOpen}

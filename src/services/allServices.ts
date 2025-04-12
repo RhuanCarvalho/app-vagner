@@ -27,6 +27,8 @@ interface Budget {
     date_schedule: string;
     services: Services[];
     media: MediaItem[];
+    company_name: string;
+    company_image: string;
 }
 
 interface DataRejectedBudget {
