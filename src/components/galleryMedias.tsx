@@ -106,6 +106,7 @@ export default function MediaGallery({ items, className }: MediaGalleryProps) {
             <ThumbnailRenderer item={item} />
           </button>
         ))}
+        {items.length === 0 && <p className="pl-2 mt-1 text-xs text-muted-foreground">Nenhuma mídia</p>}
       </div>
 
       {/* Modal for viewing media */}

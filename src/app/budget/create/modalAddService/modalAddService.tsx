@@ -1,14 +1,13 @@
 "use client"
 import Modal from "@/components/modal/modal";
-import DatePicker from 'rsuite/DatePicker';
 import SelectPicker from 'rsuite/SelectPicker';
 import 'rsuite/DatePicker/styles/index.css';
 import 'rsuite/SelectPicker/styles/index.css';
-import dayjs from 'dayjs'
 
 import { SubTitle } from "../title/subTitle";
 import { useEffect, useState } from "react";
 import { InputValueServicesCustom } from "../input-value-services.tsx/input-values-services";
+import { useAllServices } from "@/services/allServices";
 
 
 interface ModalAddServiceProps {
@@ -20,33 +19,63 @@ interface ModalAddServiceProps {
 
 export const ModalAddService = ({ isOpen, onClose, saveInfo }: ModalAddServiceProps) => {
 
+    const { state: { checkinData, categorias, services }, actions: { getCategories, getServices } } = useAllServices();
+
+    const [selectedCategorie, setSelectedCategorie] = useState<string | null>(null);
     const [selectedService, setSelectedService] = useState<string | null>(null);
     const [selectedValue, setSelectedValue] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const data = ['Alinhamento', 'Ajustes no Motor', 'Troca de Oleo', 'Revisão Geral'].map(item => ({
-        label: item,
-        value: item,
-    }));
+    useEffect(() => {
+        getCategories(Number(checkinData.company));
+    }, [isOpen])
+
+    useEffect(() => {
+        setSelectedService(null);
+        setSelectedValue(null);
+        if (selectedCategorie != null){
+            getServices(Number(checkinData.company), Number(selectedCategorie))
+        }
+    }, [selectedCategorie])
+
+    useEffect(() => {
+        if (selectedService != null){
+            const filteredService = services.filter(s => Number(s.id_service) == Number(selectedService))[0]
+            setSelectedValue(Number(filteredService.price))
+            console.log(filteredService)
+        } else {
+            setSelectedValue(null);
+        }
+    }, [selectedService])
+
+
 
     const handleSubmit = () => {
-        if (!selectedValue || !selectedService) {
-            setError("Por favor, selecione um serviço e preencha um valor.");
+        if (!selectedValue || !selectedService || !selectedCategorie) {
+            setError("Por favor, selecione uma categoria, um serviço e preencha um valor.");
             return;
         }
 
         setError(null);
 
+        const selectService = services.filter(s => Number(s.id_service) == Number(selectedService))[0]
+        const selectCategorie = categorias.filter(s => Number(s.id) == Number(selectedCategorie))[0]
+
         // Gera um ID aleatório simples
-        const randomId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-        saveInfo({ 
-            service: selectedService,  
+        const randomId = `${Date.now()}-${Math.floor(Math.random()*10000)}`;
+        saveInfo({
+            randomId: randomId,
+            id_categoria: selectCategorie.id,
+            categoria: selectCategorie.categoria,
+            id_service: selectService.id_service,
+            service: selectService.service,
             value: selectedValue,
-            id_service_item: randomId,
             isNew: true,
         });
+
         setSelectedValue(null);
         setSelectedService(null);
+        setSelectedCategorie(null);
         onClose();
 
     };
@@ -54,15 +83,16 @@ export const ModalAddService = ({ isOpen, onClose, saveInfo }: ModalAddServicePr
     const closeInX = () => {
         setSelectedValue(null);
         setSelectedService(null);
+        setSelectedCategorie(null);
         onClose();
     }
 
 
     useEffect(() => {
-        if (selectedValue || selectedService) {
+        if (selectedValue || selectedService || selectedCategorie) {
             setError(null);
         }
-    }, [selectedService, selectedValue])
+    }, [selectedService, selectedValue, selectedCategorie])
 
     return (
         <>
@@ -73,15 +103,25 @@ export const ModalAddService = ({ isOpen, onClose, saveInfo }: ModalAddServicePr
                 <div className="w-full p-2 pt-4 flex flex-col justify-center items-center gap-4 ">
                     <SubTitle message='Adicionar Serviço' />
                     <SelectPicker
+                        placeholder='Categoria'
+                        data={categorias.map(c => { return { value: c.id, label: c.categoria } })}
+                        // searchable={false}
+                        style={{ width: 216 }}
+                        value={selectedCategorie}
+                        onChange={setSelectedCategorie}
+                    />
+                    <SelectPicker
+                        disabled={selectedCategorie == null}
                         placeholder='Serviço'
-                        data={data}
+                        data={services.map(c => { return { value: c.id_service, label: c.service } })}
                         // searchable={false}
                         style={{ width: 216 }}
                         value={selectedService}
                         onChange={setSelectedService}
                     />
-                    <InputValueServicesCustom 
-                        className="border rounded-md py-2 border-slate-300 text-sm w-[216] px-2"
+                    <InputValueServicesCustom
+                        disabled={selectedCategorie == null || selectedService == null}
+                        className={`border rounded-md py-2 border-slate-300 text-sm w-[216] px-2 ${(selectedCategorie == null || selectedService == null) && "bg-gray-100 cursor-not-allowed"}`}
                         placeholder="Digite o Valor do Serviço (R$)"
                         value={selectedValue}
                         onChange={setSelectedValue}

@@ -84,7 +84,7 @@ export default function CheckinPage() {
                                 className={`${code.length < 4 ? "cursor-not-allowed" : "cursor-pointer"} active:bg-blue-600 transition-all  w-[65%] px-4 py-2 active:scale-105 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg`}
                                 onClick={handleClick}
                             >
-                                Abrir orçamento
+                                {(type === 'estimate') ? 'Ver orçamento' : 'Ver agendamento'}
                             </button>
                             {(code.length < 4 && invalidClicked) && <p className="text-xs text-red-500 font-medium">Preencha corretamente o código</p>}
                         </div>

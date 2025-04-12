@@ -158,7 +158,8 @@ export default function FileUpload({ handleFiles }: FileUploadProps) {
           className="sr-only"
           onChange={handleFileChange}
           multiple
-          accept="image/*,application/pdf,audio/*,video/*"
+          // accept="image/*,application/pdf,audio/*,video/*"
+          accept="image/*,audio/*,video/*"
         />
         <label htmlFor="file-upload">
           <Button variant="outline" size="sm" className="w-full cursor-pointer" type="button" asChild>
@@ -168,7 +169,8 @@ export default function FileUpload({ handleFiles }: FileUploadProps) {
             </span>
           </Button>
         </label>
-        <p className="mt-1 text-xs text-muted-foreground">PDF, imagens, áudios e vídeos são suportados</p>
+        {/* <p className="mt-1 text-xs text-muted-foreground">PDF, imagens, áudios e vídeos são suportados</p> */}
+        <p className="mt-1 text-xs text-muted-foreground">Imagens, áudios e vídeos são suportados</p>
       </div>
 
       {files.length > 0 && (

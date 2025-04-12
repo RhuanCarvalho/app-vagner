@@ -22,12 +22,17 @@ import { ModalConfirmeDecline } from "./confirmDecline/confirmDecline";
 import { ConfirmDeclineBugdget } from "./messageDecline/messageDecline";
 import "./style.css";
 import CustomCheckbox from "@/components/customCheckbox/customCheckboxConfirmDate";
+import { ModalLastConfirmation } from "./lastConfirmation/lastConfirmation";
 
-type ServiceForm = {
+export type ServiceForm = {
+    id_service_item: string;
+    id_service?: string;
     service: string;
     value: number;
-    id_service_item: string;
+    id_categoria?: string,
+    categoria?: string,
     isNew?: boolean;
+    randomId?: string;
 };
 
 type BudgetForm = {
@@ -102,7 +107,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     };
 
     const removeServiceItem = (id: string) => {
-        setValue("services", services.filter(service => service.id_service_item !== id));
+        setValue("services", services.filter(service => service.randomId !== id));
     }
 
     const [isCheckedDate, setIsCheckedDate] = useState(false);
@@ -110,7 +115,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
     const handleResponseClick = async () => {
 
-        if (!isCheckedDate){
+        if (!isCheckedDate) {
             setActiveWarningNoConfirmDate(true);
             return;
         }
@@ -173,9 +178,29 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const [highlightFirstInput, setHighlightFirstInput] = useState(true);
 
     useEffect(() => {
-        const timeout = setTimeout(() => setHighlightFirstInput(false), 60000);
+        const timeout = setTimeout(() => setHighlightFirstInput(false), 600000);
         return () => clearTimeout(timeout);
     }, []);
+
+
+    const [modalLastConfirmation, setModalLastConfirmation] = useState(false);
+
+    const handleOpenLastConfirmation = () => {
+        if (!isCheckedDate) {
+            setActiveWarningNoConfirmDate(true);
+            return;
+        }
+        setModalLastConfirmation(true);
+    }
+
+    const handleCancelLastConfirmation = () => {
+        setModalLastConfirmation(false);
+    }
+    
+    const handleOkLastConfirmation = () => {
+        setModalLastConfirmation(false);
+        handleResponseClick();
+    } 
 
 
     return (
@@ -263,9 +288,9 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={setIsCheckedDate} />
 
                                     {(
-                                        isCheckedDate 
+                                        isCheckedDate
                                         // || newDate.suggestions.length >= 3
-                                        ) ? <div className="h-1"></div> : <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="mt-1 w-[40%] cursor-pointer" type="button" asChild>
+                                    ) ? <div className="h-1"></div> : <Button onClick={handleAddDateOpen} variant="outline" size="sm" className="mt-1 w-[40%] cursor-pointer" type="button" asChild>
                                         <span>
                                             <CalendarPlus className="mr-2 h-4 w-4" />
                                             Sugerir data
@@ -279,8 +304,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 {services.map((service, index) => (
                                     <div key={index} className="w-full flex justify-between py-1 items-center">
                                         {service.isNew
-                                            ? <span onClick={() => removeServiceItem(service.id_service_item)} ><Trash2 className="mr-2 h-4 w-4 text-start text-red-500 cursor-pointer" /></span>
-                                            : <span><p className=" h-4 text-red-500" /></span>
+                                            ? <span onClick={() => removeServiceItem(service.randomId!)} ><Trash2 className="mr-2 h-4 w-4 text-start text-red-500 cursor-pointer" /></span>
+                                            : <span><p className=" h-4" /></span>
                                         }
                                         <p className={`text-start w-full`}>{service.service}</p>
                                         <Controller
@@ -346,7 +371,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             </div>
                             <div className="flex justify-center items-center p-2">
                                 <button
-                                    onClick={handleResponseClick}
+                                    onClick={handleOkLastConfirmation}
                                     className="transition-all w-[60%] bg-blue-500 rounded-full active:scale-105 active:bg-blue-600 hover:bg-blue-600 cursor-pointer text-white text-medium font-bold py-2 px-4"
                                 >
                                     Responder
@@ -358,7 +383,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 <p className="text-red-500 text-sm font-medium w-full text-center py-4">
                                     Para prosseguir é necessário confirmar a data!
                                 </p>
-                                }
+                            }
 
                             <div className="flex justify-center items-center p-2">
                                 <button
@@ -393,6 +418,22 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                 onClose={handleConfirmDeclineClose}
                 onFunction={rejectedBudget}
             />
+            {/* <ModalLastConfirmation
+                isOpen={modalLastConfirmation}
+                onClose={handleCancelLastConfirmation}
+                onOk={handleOkLastConfirmation}
+                services={services}
+                total={total}
+                date={
+                    {
+                        original: {
+                            date: budget?.date_schedule,
+                            period: budget?.periodo
+                        },
+                        suggested: newDate.suggestions
+                    }
+                }
+            /> */}
         </Container>
     )
 }
