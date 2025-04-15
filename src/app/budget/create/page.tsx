@@ -115,11 +115,6 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
     const handleResponseClick = async () => {
 
-        if (!isCheckedDate) {
-            setActiveWarningNoConfirmDate(true);
-            return;
-        }
-
         const formData = new FormData();
 
         // Add sugestão de data caso esteja preenchida
@@ -371,7 +366,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             </div>
                             <div className="flex justify-center items-center p-2">
                                 <button
-                                    onClick={handleOkLastConfirmation}
+                                    onClick={handleOpenLastConfirmation}
                                     className="transition-all w-[60%] bg-blue-500 rounded-full active:scale-105 active:bg-blue-600 hover:bg-blue-600 cursor-pointer text-white text-medium font-bold py-2 px-4"
                                 >
                                     Responder
@@ -418,7 +413,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                 onClose={handleConfirmDeclineClose}
                 onFunction={rejectedBudget}
             />
-            {/* <ModalLastConfirmation
+            <ModalLastConfirmation
                 isOpen={modalLastConfirmation}
                 onClose={handleCancelLastConfirmation}
                 onOk={handleOkLastConfirmation}
@@ -433,7 +428,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                         suggested: newDate.suggestions
                     }
                 }
-            /> */}
+            />
         </Container>
     )
 }

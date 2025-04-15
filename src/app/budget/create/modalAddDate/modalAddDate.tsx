@@ -99,10 +99,10 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
             return;
         }
 
-        if (!observation.trim()) {
-            setError("A observação é obrigatória.");
-            return;
-        }
+        // if (!observation.trim()) {
+        //     setError("A observação é obrigatória.");
+        //     return;
+        // }
 
         setError(null);
         saveInfo({
@@ -161,7 +161,7 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
                     {renderSuggestion("Sugestão 3", date3, setDate3, period3, setPeriod3)}
 
                     <div className="flex flex-col gap-1 w-full">
-                        <p className="font-semibold text-xs w-full text-start">Observação *</p>
+                        <p className="font-semibold text-xs w-full text-start">Observação</p>
                         <textarea
                             className="border rounded-lg p-2 border-slate-300 resize-none h-24 w-full"
                             placeholder="Digite sua observação"
