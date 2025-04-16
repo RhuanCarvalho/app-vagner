@@ -1,4 +1,5 @@
-"use client"
+'use client'
+import { sendGAEvent } from '@next/third-parties/google'
 import Modal from "@/components/modal/modal";
 import DatePicker from 'rsuite/DatePicker';
 import SelectPicker from 'rsuite/SelectPicker';
@@ -112,7 +113,7 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
             })),
             observation
         });
-
+        sendGAEvent('event', `botao_add_data`, {});
         cleanStates();
         onClose();
     };

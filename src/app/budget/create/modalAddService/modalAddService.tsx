@@ -1,4 +1,5 @@
-"use client"
+'use client'
+import { sendGAEvent } from '@next/third-parties/google'
 import Modal from "@/components/modal/modal";
 import SelectPicker from 'rsuite/SelectPicker';
 import 'rsuite/DatePicker/styles/index.css';
@@ -72,6 +73,8 @@ export const ModalAddService = ({ isOpen, onClose, saveInfo }: ModalAddServicePr
             value: selectedValue,
             isNew: true,
         });
+
+        sendGAEvent('event', `botao_add_servico`, {});
 
         setSelectedValue(null);
         setSelectedService(null);

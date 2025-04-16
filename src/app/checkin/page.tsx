@@ -1,4 +1,6 @@
 'use client'
+
+import { sendGAEvent } from '@next/third-parties/google'
 import { Container } from "@/components/containers/defaultContainer";
 import { InvalidPageAccess } from "@/components/invalidPageAccess/InvalidPageAccess";
 import Modal from "@/components/modal/modal";
@@ -46,7 +48,12 @@ export default function CheckinPage() {
                 id: id,
                 type: type,
             });
+            // 🎯 DISPARA O EVENTO PARA O GA4
             if (isValidCode) {
+                sendGAEvent('event', `botao_checkin_${(type === 'estimate') ? 'ver_orcamento' : 'ver_agendamento'}`, {
+                    company,
+                    type,
+                });
                 router.push(`/budget/create`);
             } else {
                 setInvalidCode(true);

@@ -1,5 +1,6 @@
-"use client"
+'use client'
 
+import { sendGAEvent } from '@next/third-parties/google'
 import { Container } from "@/components/containers/defaultContainer";
 import { HeaderTemplate } from "@/components/header/header";
 import { useRouter } from "next/navigation";
@@ -81,6 +82,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const [openAddDate, setOpenAddDate] = useState(false);
     const handleAddDateOpen = () => {
         setOpenAddDate(true)
+        sendGAEvent('event', `botao_abrir_modal_para_add_data`, {});
     };
     const handleAddDateClose = () => {
         setOpenAddDate(false);
@@ -98,6 +100,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const [openAddService, setOpenAddService] = useState(false);
     const handleAddServiceOpen = () => {
         setOpenAddService(true)
+        sendGAEvent('event', `botao_abrir_modal_para_add_servico`, {});
     };
     const handleAddServiceClose = () => {
         setOpenAddService(false);
@@ -108,6 +111,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
     const removeServiceItem = (id: string) => {
         setValue("services", services.filter(service => service.randomId !== id));
+        sendGAEvent('event', `botao_para_remover_servico`, {});
     }
 
     const [isCheckedDate, setIsCheckedDate] = useState(false);
@@ -150,6 +154,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const [confirmDecline, setConfirmDecline] = useState(false);
     const handleConfirmDeclineOpen = () => {
         setConfirmDecline(true)
+        sendGAEvent('event', `botao_para_abrir_modal_declinar_orcamento`, {});
     };
     const handleConfirmDeclineClose = () => {
         setConfirmDecline(false);
@@ -157,6 +162,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
 
     const rejectedBudget = () => {
+        sendGAEvent('event', `botao_para_confirmar_declinar_orcamento`, {});
         RejectedService({
             id: checkinData.id!,
             type: checkinData.type!,
@@ -185,6 +191,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             setActiveWarningNoConfirmDate(true);
             return;
         }
+        sendGAEvent('event', `botao_para_abrir_modal_responder_orcamento`, {});
         setModalLastConfirmation(true);
     }
 
@@ -194,9 +201,16 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     
     const handleOkLastConfirmation = () => {
         setModalLastConfirmation(false);
+        sendGAEvent('event', `botao_para_confirmar_responder_orcamento`, {});
         handleResponseClick();
     } 
-
+    
+    
+    
+    const btnCofirmDate = (value: boolean) => {
+        setIsCheckedDate(value);
+        sendGAEvent('event', `botao_para_confirmar_data`, {});
+    }
 
     return (
         <Container>
@@ -280,7 +294,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
                                 }
                                 <div className="w-full pt-4 flex justify-between items-start">
-                                    <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={setIsCheckedDate} />
+                                    <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={btnCofirmDate} />
 
                                     {(
                                         isCheckedDate

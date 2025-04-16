@@ -1,4 +1,5 @@
-"use client"
+'use client'
+import { sendGAEvent } from '@next/third-parties/google'
 
 import type React from "react"
 
@@ -45,6 +46,8 @@ export default function FileUpload({ handleFiles }: FileUploadProps) {
     })
 
     setFiles((prev) => [...prev, ...newFiles])
+    sendGAEvent('event', `add_arquivo`, {});
+
 
     // Reset the input value so the same file can be selected again
     e.target.value = ""
@@ -64,7 +67,7 @@ export default function FileUpload({ handleFiles }: FileUploadProps) {
       if (previewFile?.id === id) {
         setPreviewFile(null)
       }
-
+      sendGAEvent('event', `removeu_arquivo`, {});
       return filtered
     })
   }
