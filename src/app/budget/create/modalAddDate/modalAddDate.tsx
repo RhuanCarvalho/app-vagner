@@ -139,6 +139,11 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
                     onFocus={(e) => e.target.blur()}
                     value={date}
                     onChange={setDate}
+                    placeholder='Escolha uma data'
+                    disabledDate={(date) => {
+                        // Bloqueia todas as datas anteriores a hoje
+                        return dayjs(date).isBefore(dayjs(), 'day');
+                      }}
                 />
                 <SelectPicker
                     placeholder='Período'

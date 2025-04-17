@@ -7,7 +7,7 @@ export default function HomePage(){
     const router = useRouter()
     useEffect(() => {
         const IS_DEV = process.env.NEXT_PUBLIC_IS_DEV === 'true';
-        const path_router = IS_DEV ? '/checkin?id=344&company=3&type=schedule': '/checkin';
+        const path_router = IS_DEV ? '/checkin?id=370&company=2&type=estimate': '/checkin';
         router.push(path_router);
     }, [])
     return <></>
