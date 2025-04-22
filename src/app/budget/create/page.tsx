@@ -187,7 +187,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const [modalLastConfirmation, setModalLastConfirmation] = useState(false);
 
     const handleOpenLastConfirmation = () => {
-        if (!isCheckedDate) {
+        if (!isCheckedDate && newDate.suggestions.length == 0) {
             setActiveWarningNoConfirmDate(true);
             return;
         }
@@ -237,7 +237,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 <div className="w-full flex justify-between py-1 items-center">
                                     <p>Data</p>
                                     {/* <p>{budget?.date_schedule}, período da {budget?.periodo}</p> */}
-                                    <p className={`${(isCheckedDate && newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
+                                    <p className={`${(newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
                                 </div>
                                 {
                                     newDate?.suggestions?.map((date: { date: string, period: string }, index: any) => {
@@ -294,8 +294,11 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
                                 }
                                 <div className="w-full pt-4 flex justify-between items-start">
-                                    <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={btnCofirmDate} />
-
+                                {
+                                    (newDate.suggestions.length == 0) 
+                                    ? <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={btnCofirmDate} />
+                                    : <div></div>
+                                }
                                     {(
                                         isCheckedDate
                                         // || newDate.suggestions.length >= 3
@@ -388,7 +391,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                             </div>
 
                             {
-                                (activeWarningNoConfirmDate && !isCheckedDate) &&
+                                (activeWarningNoConfirmDate && !isCheckedDate && newDate.suggestions.length == 0) &&
                                 <p className="text-red-500 text-sm font-medium w-full text-center py-4">
                                     Para prosseguir é necessário confirmar a data!
                                 </p>
