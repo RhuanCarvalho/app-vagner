@@ -123,13 +123,19 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
         onClose();
     }
 
+    const disabledDates1 = [date2, date3].filter(Boolean) as Date[];
+    const disabledDates2 = [date1, date3].filter(Boolean) as Date[];
+    const disabledDates3 = [date1, date2].filter(Boolean) as Date[];
+
+
 
     const renderSuggestion = (
         label: string,
         date: Date | null,
         setDate: (value: Date | null) => void,
         period: string | null,
-        setPeriod: (value: string | null) => void
+        setPeriod: (value: string | null) => void,
+        disabledDates: Date[]
     ) => (
         <div className="flex flex-col gap-1">
             <p className="font-semibold text-xs w-full text-start">{label}</p>
@@ -140,10 +146,12 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
                     value={date}
                     onChange={setDate}
                     placeholder='Escolha uma data'
-                    disabledDate={(date) => {
-                        // Bloqueia todas as datas anteriores a hoje
-                        return dayjs(date).isBefore(dayjs(), 'day');
-                      }}
+                    disabledDate={(currentDate) => {
+                        return (
+                            dayjs(currentDate).isBefore(dayjs(), 'day') ||
+                            disabledDates.some(d => dayjs(d).isSame(dayjs(currentDate), 'day'))
+                        );
+                    }}
                 />
                 <SelectPicker
                     placeholder='Período'
@@ -156,15 +164,17 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
             </div>
         </div>
     );
+    
 
     return (
         <Modal isOpen={isOpen} onClose={closeInX}>
             <div className="w-full p-2 pt-4 flex flex-col justify-center items-center gap-4">
                 <SubTitle message='Sugerir Data' />
                 <div className="flex flex-col justify-center items-center gap-2">
-                    {renderSuggestion("Sugestão 1", date1, setDate1, period1, setPeriod1)}
-                    {renderSuggestion("Sugestão 2", date2, setDate2, period2, setPeriod2)}
-                    {renderSuggestion("Sugestão 3", date3, setDate3, period3, setPeriod3)}
+                {renderSuggestion("Sugestão 1", date1, setDate1, period1, setPeriod1, disabledDates1)}
+                {renderSuggestion("Sugestão 2", date2, setDate2, period2, setPeriod2, disabledDates2)}
+                {renderSuggestion("Sugestão 3", date3, setDate3, period3, setPeriod3, disabledDates3)}
+
 
                     <div className="flex flex-col gap-1 w-full">
                         <p className="font-semibold text-xs w-full text-start">Observação</p>
