@@ -39,6 +39,8 @@ export type ServiceForm = {
 type BudgetForm = {
     services: ServiceForm[];
     additionalInfo: string;
+    date_schedule: string | null;
+    periodo: string | null;
 };
 
 interface BudgetCreatePageProps {
@@ -58,6 +60,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                 value: Number(service.value) || 0, // Converte para número
             })) || [],
             additionalInfo: "",
+            date_schedule: null,
+            periodo: null,
         },
     });
 
@@ -65,6 +69,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     // Observar mudanças no formulário
     const services = watch("services");
     const additionalInfo = watch("additionalInfo");
+    const date_schedule = watch("date_schedule");
+    const _periodo = watch("periodo");
 
     // Calcular total
     const total = services.reduce((sum, service) => sum + Number(service.value || 0), 0);
@@ -198,19 +204,36 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const handleCancelLastConfirmation = () => {
         setModalLastConfirmation(false);
     }
-    
+
     const handleOkLastConfirmation = () => {
         setModalLastConfirmation(false);
         sendGAEvent('event', `botao_para_confirmar_responder_orcamento`, {});
         handleResponseClick();
-    } 
-    
-    
-    
-    const btnCofirmDate = (value: boolean) => {
-        setIsCheckedDate(value);
-        sendGAEvent('event', `botao_para_confirmar_data`, {});
     }
+
+
+
+    const btnCofirmDate = (checked: boolean, value: any) => {
+        if (!isCheckedDate) {
+            setIsCheckedDate(true);
+            setValue('date_schedule', value.date)
+            setValue('periodo', value.periodo)
+            sendGAEvent('event', `botao_para_confirmar_data`, {});
+            return;
+        }
+        setValue('date_schedule', null)
+        setValue('periodo', null)
+        setIsCheckedDate(false);
+        
+    }
+    
+    useEffect(() => { 
+        if (newDate.suggestions.length > 0) {
+            setValue('date_schedule', null)
+            setValue('periodo', null)
+            setIsCheckedDate(false);
+        }
+    }, [newDate])
 
     return (
         <Container>
@@ -234,11 +257,41 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                     <p className="min-w-max">{budget?.genero} {budget?.idade} anos</p> */}
                                 </div>
                                 <Divider />
-                                <div className="w-full flex justify-between py-1 items-center">
+                                {budget.options_dates.map(opDates => (
+                                    <div className={`
+                                        w-full flex justify-between py-1 pr-2 my-1 items-center  
+                                        ${((newDate.suggestions.length > 0) || (date_schedule != null && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY"))) && " bg-red-50 rounded-lg "}
+                                        ${(isCheckedDate && date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")) && "text-emerald-400 bg-emerald-50 rounded-lg"}
+                                        `}>
+                                        {
+                                            (newDate.suggestions.length > 0 || (isCheckedDate && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY")))
+                                                ?
+                                                <div></div>
+                                                :
+                                                <CustomCheckbox
+                                                    disabledComment={true}
+                                                    valueChecked={{ date: dayjs(opDates.date).format("DD/MM/YYYY"), periodo: opDates.periodo }}
+                                                    activateWarning={activeWarningNoConfirmDate}
+                                                    isChecked={date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")}
+                                                    setIsChecked={btnCofirmDate}
+                                                />
+                                        }
+                                        {/* <p className={`${(newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(opDates.date).format("DD/MM/YYYY")}, período da {opDates.periodo}</p> */}
+                                        <div className={`
+                                            w-max flex flex-col items-center justify-end 
+                                            ${(newDate.suggestions.length > 0 || (isCheckedDate && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY"))) ? "line-through" : (isCheckedDate && date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")) ? "text-emerald-400 font-semibold bg-emerald-50 rounded-lg" : ""}`}>
+                                            <p className="w-full text-end truncate font-medium">{dayjs(opDates.date).format("DD/MM/YYYY")}</p>
+                                            <p className="text-end text-[13px] text-muted-foreground font-medium">período da {opDates.periodo}</p>
+                                        </div>
+                                    </div>
+
+                                ))
+
+                                }
+                                {/* <div className="w-full flex justify-between py-1 items-center">
                                     <p>Data</p>
-                                    {/* <p>{budget?.date_schedule}, período da {budget?.periodo}</p> */}
                                     <p className={`${(newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(budget?.date_schedule).format("DD/MM/YYYY")}, período da {budget?.periodo}</p>
-                                </div>
+                                </div> */}
                                 {
                                     newDate?.suggestions?.map((date: { date: string, period: string }, index: any) => {
                                         return (
@@ -294,11 +347,12 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
                                 }
                                 <div className="w-full pt-4 flex justify-between items-start">
-                                {
+                                    {/* {
                                     (newDate.suggestions.length == 0) 
-                                    ? <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={btnCofirmDate} />
-                                    : <div></div>
-                                }
+                                    // ? <CustomCheckbox activateWarning={activeWarningNoConfirmDate} isChecked={isCheckedDate} setIsChecked={btnCofirmDate} />
+                                    && 
+                                } */}
+                                    <div></div>
                                     {(
                                         isCheckedDate
                                         // || newDate.suggestions.length >= 3
@@ -439,8 +493,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                 date={
                     {
                         original: {
-                            date: budget?.date_schedule,
-                            period: budget?.periodo
+                            date: date_schedule,
+                            period: _periodo
                         },
                         suggested: newDate.suggestions
                     }

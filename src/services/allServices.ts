@@ -41,6 +41,7 @@ interface Budget {
     media: MediaItem[];
     company_name: string;
     company_image: string;
+    options_dates: { date: string, periodo: string}[]
 }
 
 interface DataRejectedBudget {

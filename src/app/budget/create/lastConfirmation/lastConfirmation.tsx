@@ -15,8 +15,8 @@ interface ModalLastConfirmationProps {
     total: number;
     date: {
         original: {
-            period: string;
-            date: string;
+            period: string | null;
+            date: string | null;
         },
         suggested: {
             period: string;
@@ -43,12 +43,14 @@ export const ModalLastConfirmation = ({ isOpen, onClose, onOk, services, total, 
                 <SubTitle message='Confirmar' />
                 <div className="w-full flex flex-col justify-center items-center gap-2">
                     <p className="font-bold text-sm w-full text-start">Data</p>
-                    <div className="flex w-full items-center justify-between pl-2">
-                        {date.suggested.length > 0 &&
-                         <p className={`font-semibold text-[12px] w-full text-start`}>{date.suggested.length > 0 && "Original"}</p>
-                        }
-                        <p className={`font-semibold text-[12px] w-full min-w-max ${(date.suggested.length > 0) ? "line-through text-end":"text-start"}`}>{dayjs(date.original.date).format("DD/MM/YYYY")}, período da {date.original.period}</p>
-                    </div>
+                    { date.original.date != null &&
+                        <div className="flex w-full items-center justify-between pl-2">
+                            {date.suggested.length > 0 &&
+                            <p className={`font-semibold text-[12px] w-full text-start`}>{date.suggested.length > 0 && "Original"}</p>
+                            }
+                            <p className={`font-semibold text-[12px] w-full min-w-max ${(date.suggested.length > 0) ? "line-through text-end":"text-start"}`}>{date.original.date}, período da {date.original.period}</p>
+                        </div>
+                    }
                     {date.suggested.length > 0 &&
                         date.suggested.map((d, i) => {
                             return (

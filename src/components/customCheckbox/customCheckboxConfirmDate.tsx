@@ -4,17 +4,19 @@ import { CheckIcon } from "lucide-react"
 
 interface CustomCheckboxProps {
   isChecked: boolean; 
-  setIsChecked: (value: boolean) => void;
+  setIsChecked: (checked: boolean, value: any) => void;
   activateWarning: boolean;
+  disabledComment?: boolean;
+  valueChecked: any;
 }
 
-export default function CustomCheckbox({isChecked, setIsChecked, activateWarning=false}:CustomCheckboxProps) {
+export default function CustomCheckbox({isChecked, setIsChecked, valueChecked, activateWarning=false, disabledComment=false}:CustomCheckboxProps) {
   return (
     <div className="flex items-center justify-center">
       <div className="flex flex-col items-start gap-1">
         <button
           type="button"
-          onClick={() => setIsChecked(!isChecked)}
+          onClick={() => setIsChecked(!isChecked, valueChecked)}
           className={`group relative flex items-center justify-center rounded-lg border-2 pl-3 pr-6 py-2 font-medium transition-all duration-300 ease-in-out ${
             isChecked
               ? "border-emerald-500 bg-emerald-50 text-emerald-700 shadow-md "
@@ -40,12 +42,13 @@ export default function CustomCheckbox({isChecked, setIsChecked, activateWarning
             </div>
           )}
         </button>
-
-        <p
-          className={`w-full text-sm transition-colors text-center ${(activateWarning && !isChecked) ? "text-red-500" : isChecked ? "text-emerald-600" : "text-gray-500"}`}
-        >
-          {isChecked ? "Data confirmada!" : "Clique para confirmar a data"}
-        </p>
+          { !disabledComment &&
+            <p
+              className={`w-full text-sm transition-colors text-center ${(activateWarning && !isChecked) ? "text-red-500" : isChecked ? "text-emerald-600" : "text-gray-500"}`}
+            >
+              {isChecked ? "Data confirmada!" : "Clique para confirmar a data"}
+            </p>
+          }
       </div>
     </div>
   )
