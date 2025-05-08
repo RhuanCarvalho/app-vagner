@@ -36,7 +36,7 @@ export const ModalAddDate = ({ isOpen, onClose, saveInfo, info }: ModalAddDatePr
     const [observation, setObservation] = useState('');
     const [error, setError] = useState<string | null>(null);
 
-    const data = ['manhã', 'tarde'].map(item => ({
+    const data = ['manha', 'tarde'].map(item => ({
         label: item,
         value: item,
     }));

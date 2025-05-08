@@ -41,6 +41,10 @@ type BudgetForm = {
     additionalInfo: string;
     date_schedule: string | null;
     periodo: string | null;
+    confirmed_date :{
+        date: string | null,
+        period: string | null
+    }
 };
 
 interface BudgetCreatePageProps {
@@ -62,6 +66,10 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             additionalInfo: "",
             date_schedule: null,
             periodo: null,
+            confirmed_date: {
+                date: '',
+                period: ''
+            }
         },
     });
 
@@ -146,6 +154,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             formData.append(`files`, file.file); // `file.file` deve ser um objeto File válido
         });
 
+        // console.log("Form", formData);
         const isValid = await sendBudget(formData);
 
         if (isValid) {
@@ -219,11 +228,15 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             setIsCheckedDate(true);
             setValue('date_schedule', value.date)
             setValue('periodo', value.periodo)
+            setValue('confirmed_date.date', dayjs(value.date).format("YYYY-MM-DD"))
+            setValue('confirmed_date.period', value.periodo)
             sendGAEvent('event', `botao_para_confirmar_data`, {});
             return;
         }
         setValue('date_schedule', null)
         setValue('periodo', null)
+        setValue('confirmed_date.date', null)
+        setValue('confirmed_date.period', null)
         setIsCheckedDate(false);
         
     }
@@ -232,6 +245,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         if (newDate.suggestions.length > 0) {
             setValue('date_schedule', null)
             setValue('periodo', null)
+            setValue('confirmed_date.date', null)
+            setValue('confirmed_date.period', null)
             setIsCheckedDate(false);
         }
     }, [newDate])
@@ -245,7 +260,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                     <>
                         <TitleHeader title={budget?.car!} />
                         <div className="w-max px-6 pt-8">
-                            <p className="bg-blue-500 text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.approval_expires_at}</p>
+                            <p className="bg-[#FFDE00] text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.approval_expires_at}</p>
                         </div>
                         <div>
                             <SubTitle message='Sobre o agendamento' />
@@ -273,7 +288,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                                     disabledComment={true}
                                                     valueChecked={{ date: dayjs(opDates.date).format("DD/MM/YYYY"), periodo: opDates.periodo }}
                                                     activateWarning={activeWarningNoConfirmDate}
-                                                    isChecked={date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")}
+                                                    isChecked={date_schedule == dayjs(opDates.date).format("DD/MM/YYYY") && _periodo == opDates.periodo
+                                                    }
                                                     setIsChecked={btnCofirmDate}
                                                 />
                                         }
