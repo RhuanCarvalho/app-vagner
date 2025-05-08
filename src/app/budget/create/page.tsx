@@ -25,6 +25,10 @@ import "./style.css";
 import CustomCheckbox from "@/components/customCheckbox/customCheckboxConfirmDate";
 import { ModalLastConfirmation } from "./lastConfirmation/lastConfirmation";
 
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(customParseFormat);
+
 export type ServiceForm = {
     id_service_item: string;
     id_service?: string;
@@ -228,7 +232,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             setIsCheckedDate(true);
             setValue('date_schedule', value.date)
             setValue('periodo', value.periodo)
-            setValue('confirmed_date.date', dayjs(value.date).format("YYYY-MM-DD"))
+            setValue('confirmed_date.date', dayjs(value.date, "DD/MM/YYYY").format("YYYY-MM-DD"))
             setValue('confirmed_date.period', value.periodo)
             sendGAEvent('event', `botao_para_confirmar_data`, {});
             return;
