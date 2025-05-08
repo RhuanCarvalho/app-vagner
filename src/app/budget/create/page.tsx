@@ -172,6 +172,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         RejectedService({
             id: checkinData.id!,
             type: checkinData.type!,
+            company: checkinData.company!,
         })
         setOk(true);
         setIsDecline(true);

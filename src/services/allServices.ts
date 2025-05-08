@@ -47,6 +47,7 @@ interface Budget {
 interface DataRejectedBudget {
     id: string;
     type: string;
+    company: string;
 }
 
 interface useCheckinProps {
