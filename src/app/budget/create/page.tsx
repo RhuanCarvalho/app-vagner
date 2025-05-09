@@ -83,6 +83,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
     const additionalInfo = watch("additionalInfo");
     const date_schedule = watch("date_schedule");
     const _periodo = watch("periodo");
+    const confirmed_date = watch("confirmed_date");
 
     // Calcular total
     const total = services.reduce((sum, service) => sum + Number(service.value || 0), 0);
@@ -146,6 +147,8 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
 
         // Adicionar os serviços como um JSON stringificado
         formData.append("services", JSON.stringify(services));
+        
+        formData.append("confirmed_date", JSON.stringify(confirmed_date));
 
         // Adicionar o campo adicional
         formData.append("additionalInfo", additionalInfo);
@@ -158,7 +161,10 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             formData.append(`files`, file.file); // `file.file` deve ser um objeto File válido
         });
 
-        // console.log("Form", formData);
+        // for (const [key, value] of formData.entries()) {
+        //     console.log(`${key}:`, value);
+        // }
+        
         const isValid = await sendBudget(formData);
 
         if (isValid) {
@@ -278,13 +284,13 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                 </div>
                                 <Divider />
                                 {budget.options_dates.map(opDates => (
-                                    <div className={`
+                                    <div key={`${opDates.date}${opDates.periodo}`} className={`
                                         w-full flex justify-between py-1 pr-2 my-1 items-center  
-                                        ${((newDate.suggestions.length > 0) || (date_schedule != null && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY"))) && " bg-red-50 rounded-lg "}
-                                        ${(isCheckedDate && date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")) && "text-emerald-400 bg-emerald-50 rounded-lg"}
+                                        ${((newDate.suggestions.length > 0) || (date_schedule != null && (date_schedule != dayjs(opDates.date).format("DD/MM/YYYY") || _periodo != opDates.periodo))) && " bg-red-50 rounded-lg "}
+                                        ${(isCheckedDate && (date_schedule == dayjs(opDates.date).format("DD/MM/YYYY") &&  _periodo == opDates.periodo)) && "text-emerald-400 bg-emerald-50 rounded-lg"}
                                         `}>
                                         {
-                                            (newDate.suggestions.length > 0 || (isCheckedDate && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY")))
+                                            (newDate.suggestions.length > 0 || (isCheckedDate && (date_schedule != dayjs(opDates.date).format("DD/MM/YYYY") || _periodo != opDates.periodo)))
                                                 ?
                                                 <div></div>
                                                 :
@@ -292,15 +298,14 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                                     disabledComment={true}
                                                     valueChecked={{ date: dayjs(opDates.date).format("DD/MM/YYYY"), periodo: opDates.periodo }}
                                                     activateWarning={activeWarningNoConfirmDate}
-                                                    isChecked={date_schedule == dayjs(opDates.date).format("DD/MM/YYYY") && _periodo == opDates.periodo
-                                                    }
+                                                    isChecked={date_schedule == dayjs(opDates.date).format("DD/MM/YYYY") && _periodo == opDates.periodo}
                                                     setIsChecked={btnCofirmDate}
                                                 />
                                         }
                                         {/* <p className={`${(newDate.suggestions.length > 0) ? "line-through" : isCheckedDate ? "text-emerald-400 font-semibold" : ""}`}>{dayjs(opDates.date).format("DD/MM/YYYY")}, período da {opDates.periodo}</p> */}
                                         <div className={`
                                             w-max flex flex-col items-center justify-end 
-                                            ${(newDate.suggestions.length > 0 || (isCheckedDate && date_schedule != dayjs(opDates.date).format("DD/MM/YYYY"))) ? "line-through" : (isCheckedDate && date_schedule == dayjs(opDates.date).format("DD/MM/YYYY")) ? "text-emerald-400 font-semibold bg-emerald-50 rounded-lg" : ""}`}>
+                                            ${(newDate.suggestions.length > 0 || (isCheckedDate && (date_schedule != dayjs(opDates.date).format("DD/MM/YYYY")||  _periodo != opDates.periodo) )) ? "line-through" : (isCheckedDate && (date_schedule == dayjs(opDates.date).format("DD/MM/YYYY") &&  _periodo == opDates.periodo)) ? "text-emerald-400 font-semibold bg-emerald-50 rounded-lg" : ""}`}>
                                             <p className="w-full text-end truncate font-medium">{dayjs(opDates.date).format("DD/MM/YYYY")}</p>
                                             <p className="text-end text-[13px] text-muted-foreground font-medium">período da {opDates.periodo}</p>
                                         </div>
