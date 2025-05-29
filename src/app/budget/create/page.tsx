@@ -270,7 +270,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                     <>
                         <TitleHeader title={budget?.car!} />
                         <div className="w-max px-6 pt-8">
-                            <p className="bg-[#FFDE00] text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.approval_expires_at}</p>
+                            <p className="bg-[#cfb400] text-white shadow-lg font-medium text-lg px-8 py-1 rounded-lg">Expira em {budget?.approval_expires_at}</p>
                         </div>
                         <div>
                             <SubTitle message='Sobre o agendamento' />
@@ -406,7 +406,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
                                             render={({ field }) => (
                                                 <InputValueServices
                                                     {...field}
-                                                    className={`${index === 0 && highlightFirstInput ? "jump p-1 bg-slate-100 rounded-lg" : ""}`}
+                                                    className={`w-[102px] ${index === 0 && highlightFirstInput ? "jump p-1 bg-slate-100 rounded-lg" : ""}`}
                                                     value={Number(field.value) || 0}
                                                     onChange={(e) => {
                                                         field.onChange(e)
