@@ -155,6 +155,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
         formData.append("type", checkinData.type!);
         formData.append("id", checkinData.id!);
         formData.append("company", checkinData.company!);
+        formData.append("id_estimate_service", checkinData.id_estimate_service!);
 
         // Adicionar os arquivos ao FormData
         files.forEach((file, index) => {
@@ -192,6 +193,7 @@ export default function BudgetCreatePage({ }: BudgetCreatePageProps) {
             id: checkinData.id!,
             type: checkinData.type!,
             company: checkinData.company!,
+            id_estimate_service: checkinData.id_estimate_service!,
         })
         setOk(true);
         setIsDecline(true);

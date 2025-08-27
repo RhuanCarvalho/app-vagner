@@ -1,3 +1,4 @@
+import { CardBudgetProps } from "@/app/admin/(AdminAuthentication)/budgets/components/Cards";
 
 interface Service {
     name_service: string;
@@ -182,3 +183,38 @@ export const users = [
         ]
     }
 ];
+
+
+
+export const fakeBudgetsPageBudgets: CardBudgetProps[] = [
+    {
+        index: '#101',
+        name: 'José Silva',
+        serives: 'Troca de oleo, troca pneu',
+        status: "Pendente"
+    },
+    {
+        index: '#111',
+        name: 'Alvares Dornelas',
+        serives: 'Martelinho',
+        status: "Respondido"
+    },
+    {
+        index: '#125',
+        name: 'Juliana Camargo',
+        serives: 'Alinhamento',
+        status: "Cancelado"
+    },
+    {
+        index: '#058',
+        name: 'Fulano de Tal',
+        serives: 'Reparo motor',
+        status: "Respondido"
+    },
+    {
+        index: '#001',
+        name: 'Umestranho Qualquer',
+        serives: 'Algum serviço, outro serviço',
+        status: "Pendente"
+    },
+]

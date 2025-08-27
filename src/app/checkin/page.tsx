@@ -20,6 +20,7 @@ export default function CheckinPage() {
     const company = searchParams.get('company') as string;
     const id = searchParams.get('id') as string;
     const type = searchParams.get('type') as string;
+    const id_estimate_service = searchParams.get('id_estimate_service') as string;
 
     const [code, setCode] = useState('');
     const handleSetCode = (code: string) => setCode(code);
@@ -31,10 +32,10 @@ export default function CheckinPage() {
 
 
     useEffect(() => {
-        if ([company, id, type].some(param => !param)) {
+        if ([company, id, type, id_estimate_service].some(param => !param)) {
             setInvalidUrl(true);
         }
-    }, [company, id, type]);
+    }, [company, id, type, id_estimate_service]);
 
     const handleClick = async () => {
 
@@ -47,6 +48,7 @@ export default function CheckinPage() {
                 company: company,
                 id: id,
                 type: type,
+                id_estimate_service: id_estimate_service,
             });
             // 🎯 DISPARA O EVENTO PARA O GA4
             if (isValidCode) {

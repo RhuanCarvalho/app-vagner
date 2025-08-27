@@ -7,6 +7,7 @@ interface DataVerifyCheckin {
     company: string | null | undefined;
     id: string | null | undefined;
     type: string | null | undefined | "estimate" | "schedule";
+    id_estimate_service: string;
 }
 
 interface Categories {
@@ -48,6 +49,7 @@ interface DataRejectedBudget {
     id: string;
     type: string;
     company: string;
+    id_estimate_service: string;
 }
 
 interface useCheckinProps {
