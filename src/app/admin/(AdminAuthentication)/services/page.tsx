@@ -1,76 +1,78 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Package, Edit, Save, X, ChevronUp, Trash2 } from "lucide-react"
+import { ServiceProps, useServices } from "@/services/adminServices/services/servicesServices"
 
-interface Produto {
-    id: number
-    nome: string
-    valor: number
-    categoria: string
+interface AddServiceProps {
+    service: string;
+    categoria: string;
+    price: string;
 }
 
 export default function ProdutosPage() {
-    const [produtos, setProdutos] = useState<Produto[]>([
-        { id: 1, nome: "Troca de óleo", valor: 150.0, categoria: "Manutenção Motor" },
-        { id: 2, nome: "Alinhamento", valor: 389.9, categoria: "Manutenção Pneus" },
-        { id: 3, nome: "Revisão Geral", valor: 299.99, categoria: "Manutenção Geral" },
-    ])
+
+    const {
+        state: { services },
+        actions: {
+            getServices
+        }
+    } = useServices();
 
     const [mostrarFormulario, setMostrarFormulario] = useState(false)
-    const [novoProduto, setNovoProduto] = useState({ nome: "", valor: "", categoria: "" })
-    const [editandoProduto, setEditandoProduto] = useState<number | null>(null)
-    const [produtoEditado, setProdutoEditado] = useState({ nome: "", valor: "", categoria: "" })
+    const [novoProduto, setNovoProduto] = useState<AddServiceProps>({ service: "", price: "", categoria: "" })
+    const [editandoProduto, setEditandoProduto] = useState<string | null>(null)
+    const [produtoEditado, setProdutoEditado] = useState<AddServiceProps>({ service: "", price: "", categoria: "" })
 
     const adicionarProduto = () => {
-        if (novoProduto.nome && novoProduto.valor && novoProduto.categoria) {
-            const produto: Produto = {
-                id: produtos.length + 1,
-                nome: novoProduto.nome,
-                valor: Number.parseFloat(novoProduto.valor),
-                categoria: novoProduto.categoria,
-            }
-            setProdutos([...produtos, produto])
-            setNovoProduto({ nome: "", valor: "", categoria: "" })
-            setMostrarFormulario(false)
-        }
+        // if (novoProduto.nome && novoProduto.valor && novoProduto.categoria) {
+        //     const produto: Produto = {
+        //         id: produtos.length + 1,
+        //         nome: novoProduto.nome,
+        //         valor: Number.parseFloat(novoProduto.valor),
+        //         categoria: novoProduto.categoria,
+        //     }
+        //     setProdutos([...produtos, produto])
+        //     setNovoProduto({ nome: "", valor: "", categoria: "" })
+        //     setMostrarFormulario(false)
+        // }
     }
 
-    const iniciarEdicao = (produto: Produto) => {
-        setEditandoProduto(produto.id)
-        setProdutoEditado({ nome: produto.nome, valor: produto.valor.toString(), categoria: produto.categoria })
+    const iniciarEdicao = (produto: ServiceProps) => {
+        setEditandoProduto(produto.id_company_service)
+        // setProdutoEditado({ nome: produto.nome, valor: produto.valor.toString(), categoria: produto.categoria })
     }
 
     const salvarEdicao = () => {
-        if (editandoProduto && produtoEditado.nome && produtoEditado.valor && produtoEditado.categoria) {
-            setProdutos(
-                produtos.map((p) =>
-                    p.id === editandoProduto
-                        ? {
-                            ...p,
-                            nome: produtoEditado.nome,
-                            valor: Number.parseFloat(produtoEditado.valor),
-                            categoria: produtoEditado.categoria,
-                        }
-                        : p,
-                ),
-            )
-            setEditandoProduto(null)
-            setProdutoEditado({ nome: "", valor: "", categoria: "" })
-        }
+        // if (editandoProduto && produtoEditado.nome && produtoEditado.valor && produtoEditado.categoria) {
+        //     setProdutos(
+        //         produtos.map((p) =>
+        //             p.id === editandoProduto
+        //                 ? {
+        //                     ...p,
+        //                     nome: produtoEditado.nome,
+        //                     valor: Number.parseFloat(produtoEditado.valor),
+        //                     categoria: produtoEditado.categoria,
+        //                 }
+        //                 : p,
+        //         ),
+        //     )
+        //     setEditandoProduto(null)
+        //     setProdutoEditado({ nome: "", valor: "", categoria: "" })
+        // }
     }
 
     const cancelarEdicao = () => {
         setEditandoProduto(null)
-        setProdutoEditado({ nome: "", valor: "", categoria: "" })
+        setProdutoEditado({ service: "", price: "", categoria: "" })
     }
 
-    const excluirProduto = (id: number) => {
-        setProdutos(produtos.filter((p) => p.id !== id))
+    const excluirProduto = (id: string) => {
+        // setProdutos(produtos.filter((p) => p.id !== id))
     }
 
     const formatarValor = (valor: number) => {
@@ -79,6 +81,10 @@ export default function ProdutosPage() {
             currency: "BRL",
         }).format(valor)
     }
+
+    useEffect(() => {
+        getServices();
+    }, [])
 
     return (
         <div className="container mx-auto p-6 w-full overflow-y-auto">
@@ -103,8 +109,8 @@ export default function ProdutosPage() {
                             <Input
                                 id="nome"
                                 placeholder="Digite o nome do serviço"
-                                value={novoProduto.nome}
-                                onChange={(e) => setNovoProduto({ ...novoProduto, nome: e.target.value })}
+                                value={novoProduto.service}
+                                onChange={(e) => setNovoProduto({ ...novoProduto, service: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
@@ -123,15 +129,15 @@ export default function ProdutosPage() {
                                 type="number"
                                 step="0.01"
                                 placeholder="0,00"
-                                value={novoProduto.valor}
-                                onChange={(e) => setNovoProduto({ ...novoProduto, valor: e.target.value })}
+                                value={novoProduto.price}
+                                onChange={(e) => setNovoProduto({ ...novoProduto, price: e.target.value })}
                             />
                         </div>
                     </div>
                     <div className="flex gap-2 mt-4">
                         <Button
                             onClick={adicionarProduto}
-                            disabled={!novoProduto.nome || !novoProduto.valor || !novoProduto.categoria}
+                            disabled={!novoProduto.service || !novoProduto.price || !novoProduto.categoria}
                             className="bg-[#002547] text-white"
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -141,7 +147,7 @@ export default function ProdutosPage() {
                             variant="outline"
                             onClick={() => {
                                 setMostrarFormulario(false)
-                                setNovoProduto({ nome: "", valor: "", categoria: "" })
+                                setNovoProduto({ service: "", price: "", categoria: "" })
                             }}
                         >
                             <X className="h-4 w-4 mr-2" />
@@ -151,7 +157,7 @@ export default function ProdutosPage() {
                 </div>
             )}
 
-            {produtos.length === 0 ? (
+            {services.length === 0 ? (
                 <div className="text-center py-12 bg-muted/20 rounded-lg">
                     <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">Nenhum serviço cadastrado</h3>
@@ -170,14 +176,14 @@ export default function ProdutosPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {produtos.map((produto) => (
-                                <TableRow key={produto.id} className="hover:bg-muted/50">
-                                    <TableCell className="font-medium">{produto.id}</TableCell>
+                            {services.map((produto) => (
+                                <TableRow key={produto.id_company_service} className="hover:bg-muted/50">
+                                    <TableCell className="font-medium">{produto.id_company_service}</TableCell>
                                     <TableCell>
-                                        {editandoProduto === produto.id ? (
+                                        {editandoProduto === produto.id_company_service ? (
                                             <Input
-                                                value={produtoEditado.nome}
-                                                onChange={(e) => setProdutoEditado({ ...produtoEditado, nome: e.target.value })}
+                                                value={produtoEditado.service}
+                                                onChange={(e) => setProdutoEditado({ ...produtoEditado, service: e.target.value })}
                                                 className="max-w-xs"
                                             />
                                         ) : (
@@ -185,12 +191,12 @@ export default function ProdutosPage() {
                                                 className="cursor-pointer hover:text-primary transition-colors"
                                                 onClick={() => iniciarEdicao(produto)}
                                             >
-                                                {produto.nome}
+                                                {produto.service}
                                             </span>
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        {editandoProduto === produto.id ? (
+                                        {editandoProduto === produto.id_company_service ? (
                                             <Input
                                                 value={produtoEditado.categoria}
                                                 onChange={(e) => setProdutoEditado({ ...produtoEditado, categoria: e.target.value })}
@@ -206,12 +212,12 @@ export default function ProdutosPage() {
                                         )}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        {editandoProduto === produto.id ? (
+                                        {editandoProduto === produto.id_company_service ? (
                                             <Input
                                                 type="number"
                                                 step="0.01"
-                                                value={produtoEditado.valor}
-                                                onChange={(e) => setProdutoEditado({ ...produtoEditado, valor: e.target.value })}
+                                                value={produtoEditado.price}
+                                                onChange={(e) => setProdutoEditado({ ...produtoEditado, price: e.target.value })}
                                                 className="max-w-[120px] ml-auto"
                                             />
                                         ) : (
@@ -219,12 +225,12 @@ export default function ProdutosPage() {
                                                 className="cursor-pointer hover:text-primary transition-colors font-semibold"
                                                 onClick={() => iniciarEdicao(produto)}
                                             >
-                                                {formatarValor(produto.valor)}
+                                                {formatarValor(Number(produto.price))}
                                             </span>
                                         )}
                                     </TableCell>
                                     <TableCell>
-                                        {editandoProduto === produto.id ? (
+                                        {editandoProduto === produto.id_company_service ? (
                                             <div className="flex gap-1">
                                                 <Button className="bg-[#002547] text-white" size="sm" onClick={salvarEdicao}>
                                                     <Save className="h-3 w-3" />
@@ -242,7 +248,7 @@ export default function ProdutosPage() {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    onClick={() => excluirProduto(produto.id)}
+                                                    onClick={() => excluirProduto(produto.id_company_service)}
                                                     className="text-destructive hover:text-destructive"
                                                 >
                                                     <Trash2 className="h-3 w-3 text-red-600" />
@@ -258,10 +264,10 @@ export default function ProdutosPage() {
                 </div>
             )}
 
-            {produtos.length > 0 && (
+            {services.length > 0 && (
                 <div className="mt-6 text-center text-muted-foreground">
                     <p>
-                        {produtos.length} serviço{produtos.length !== 1 ? "s" : ""} cadastrado{produtos.length !== 1 ? "s" : ""}
+                        {services.length} serviço{services.length !== 1 ? "s" : ""} cadastrado{services.length !== 1 ? "s" : ""}
                     </p>
                 </div>
             )}

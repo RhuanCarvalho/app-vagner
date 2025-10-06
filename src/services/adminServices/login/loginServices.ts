@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import { create } from "zustand";
 import { z } from 'zod';
-import { api } from "@/config/configService";
+import { apiAdmin } from "@/config/configService";
 
 
 export const loginSchema = z.object({
@@ -98,7 +98,7 @@ export const useUser = create<useUserProps>((set, get) => ({
                 setLoadingAuth(true);
                 
                 // Chamada real para a API
-                const { data } = await api.post<AuthResponse>('/copiloto/index.php/provider/login', {
+                const { data } = await apiAdmin.post<AuthResponse>('/copiloto/index.php/provider/login', {
                     email: sendData.email,
                     senha: sendData.password // Note que o campo é "senha" na API
                 });
@@ -138,10 +138,10 @@ export const useUser = create<useUserProps>((set, get) => ({
 
         setAuth: (user: UserProps, token: string) => {
             saveAuthToStorage(user, token);
-            
+            console.log("token", token)
             // Configura o token no axios para as próximas requisições
-            if (api.defaults.headers) {
-                api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            if (apiAdmin.defaults.headers) {
+                apiAdmin.defaults.headers.common['Authorization'] = `Bearer ${token}`;
             }
 
             set({
@@ -159,8 +159,9 @@ export const useUser = create<useUserProps>((set, get) => ({
             
             if (user && token) {
                 // Configura o token no axios
-                if (api.defaults.headers) {
-                    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                console.log("initializeAuth Token", token)
+                if (apiAdmin.defaults.headers) {
+                    apiAdmin.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 }
 
                 set({
