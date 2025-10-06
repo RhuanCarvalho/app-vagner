@@ -138,7 +138,6 @@ export const useUser = create<useUserProps>((set, get) => ({
 
         setAuth: (user: UserProps, token: string) => {
             saveAuthToStorage(user, token);
-            console.log("token", token)
             // Configura o token no axios para as próximas requisições
             if (apiAdmin.defaults.headers) {
                 apiAdmin.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -159,7 +158,6 @@ export const useUser = create<useUserProps>((set, get) => ({
             
             if (user && token) {
                 // Configura o token no axios
-                console.log("initializeAuth Token", token)
                 if (apiAdmin.defaults.headers) {
                     apiAdmin.defaults.headers.common['Authorization'] = `Bearer ${token}`;
                 }
