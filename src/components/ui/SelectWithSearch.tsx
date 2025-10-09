@@ -17,6 +17,7 @@ interface SelectWithSearchProps {
   onValueChange: (value: string) => void
   placeholder?: string
   className?: string
+  disabled?: boolean
 }
 
 export function SelectWithSearch({
@@ -24,7 +25,8 @@ export function SelectWithSearch({
   value,
   onValueChange,
   placeholder = "Selecione uma opção",
-  className = ""
+  className = "",
+  disabled = false
 }: SelectWithSearchProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -49,9 +51,15 @@ export function SelectWithSearch({
   }, [])
 
   const handleSelect = (optionValue: string) => {
+    if (disabled) return
     onValueChange(optionValue)
     setIsOpen(false)
     setSearchTerm("")
+  }
+
+  const handleToggle = () => {
+    if (disabled) return
+    setIsOpen(!isOpen)
   }
 
   return (
@@ -59,16 +67,29 @@ export function SelectWithSearch({
       <Button
         type="button"
         variant="outline"
-        className="w-full justify-between bg-white hover:bg-gray-50"
-        onClick={() => setIsOpen(!isOpen)}
+        className={`w-full justify-between ${
+          disabled 
+            ? "bg-gray-100 cursor-not-allowed opacity-50" 
+            : "bg-white hover:bg-gray-50"
+        }`}
+        onClick={handleToggle}
+        disabled={disabled}
       >
-        <span className={selectedOption ? "text-foreground" : "text-muted-foreground"}>
+        <span className={
+          disabled 
+            ? "text-muted-foreground" 
+            : selectedOption 
+              ? "text-foreground" 
+              : "text-muted-foreground"
+        }>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-4 w-4 transition-transform ${
+          isOpen ? "rotate-180" : ""
+        } ${disabled ? "text-muted-foreground" : ""}`} />
       </Button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
           {/* Campo de busca */}
           <div className="p-2 border-b border-gray-100">

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Package, Edit, Save, X, ChevronUp, Trash2, Search } from "lucide-react"
-import { ServiceProps, useServices } from "@/services/adminServices/services/servicesServices"
+import { ServiceProps, ServiceSelectProps, useServices } from "@/services/adminServices/services/servicesServices"
 import { SelectWithSearch } from "@/components/ui/SelectWithSearch" // Importe o novo componente
 
 interface AddServiceProps {
@@ -39,7 +39,11 @@ export default function ProdutosPage() {
         state: { services, selectCategorias },
         actions: {
             getServices,
-            getCategorias
+            getCategorias,
+            getServicesForSelect,
+            addService,
+            updateService,
+            removeService
         }
     } = useServices();
 
@@ -48,12 +52,68 @@ export default function ProdutosPage() {
     const [editandoProduto, setEditandoProduto] = useState<string | null>(null)
     const [produtoEditado, setProdutoEditado] = useState<AddServiceProps>({ service: "", price: "", categoria: "" })
     const [filtro, setFiltro] = useState("")
+    const [serviceOptions, setServiceOptions] = useState<{ value: string; label: string }[]>([])
+    const [loadingServices, setLoadingServices] = useState(false)
 
     // Converter categorias para o formato do SelectWithSearch
     const categoriaOptions = selectCategorias.map(categoria => ({
-        value: categoria.nome,
+        value: categoria.idCategoria,
         label: categoria.nome
     }))
+
+    // Função para carregar serviços baseado na categoria selecionada
+    const carregarServicosPorCategoria = async (categoria_id: string) => {
+        if (!categoria_id) {
+            setServiceOptions([])
+            return
+        }
+
+        setLoadingServices(true)
+        try {
+            const servicesData: ServiceSelectProps[] = await getServicesForSelect(categoria_id)
+            const options = servicesData.map((service: ServiceSelectProps) => ({
+                value: service.idservice, // ou service.service, dependendo do que a API retorna
+                label: service.nome
+            }))
+            setServiceOptions(options)
+        } catch (error) {
+            console.error("Erro ao carregar serviços:", error)
+            setServiceOptions([])
+        } finally {
+            setLoadingServices(false)
+        }
+    }
+
+    // Função para lidar com mudança de categoria
+    const handleCategoriaChange = (categoria_id: string) => {
+        setNovoProduto({
+            ...novoProduto,
+            categoria: categoria_id,
+            service: "", // Limpa o serviço selecionado quando muda a categoria
+            price: "" // Limpa o preço quando muda a categoria
+        })
+        
+        if (categoria_id) {
+            carregarServicosPorCategoria(categoria_id)
+        } else {
+            setServiceOptions([])
+        }
+    }
+
+    // Função para lidar com mudança de serviço
+    const handleServiceChange = (service: string) => {
+        setNovoProduto({
+            ...novoProduto,
+            service,
+            price: "" // Limpa o preço quando muda o serviço
+        })
+    }
+
+    // Função para obter o nome da categoria pelo ID
+    const getCategoriaNomeById = (categoriaId: string) => {
+        const categoria = selectCategorias.find(cat => cat.idCategoria === categoriaId)
+        return categoria ? categoria.nome : categoriaId
+    }
 
     // Função para filtrar os serviços
     const servicosFiltrados = services.filter((produto) => {
@@ -77,18 +137,42 @@ export default function ProdutosPage() {
         );
     });
 
-    const adicionarProduto = () => {
-        // if (novoProduto.nome && novoProduto.valor && novoProduto.categoria) {
-        //     const produto: Produto = {
-        //         id: produtos.length + 1,
-        //         nome: novoProduto.nome,
-        //         valor: Number.parseFloat(novoProduto.valor),
-        //         categoria: novoProduto.categoria,
-        //     }
-        //     setProdutos([...produtos, produto])
-        //     setNovoProduto({ nome: "", valor: "", categoria: "" })
-        //     setMostrarFormulario(false)
-        // }
+    // const adicionarProduto = async () => {
+    //     // me ajuda a montar o adicionar produto por favor,  e apos adicionar o produtos
+    //     const payload = AddServiceProps {
+    //         service_id: string,
+    //         price: number
+    //     }
+    //     await addService(payloadAddServiceProps)
+        
+    // }
+
+    const adicionarProduto = async () => {
+        if (!novoProduto.service || !novoProduto.price || !novoProduto.categoria) {
+            alert("Preencha todos os campos obrigatórios");
+            return;
+        }
+
+        try {
+            const payload = {
+                service_id: novoProduto.service,
+                price: novoProduto.price
+            };
+
+            await addService(payload);
+            
+            // Limpar formulário após adicionar
+            setNovoProduto({ service: "", price: "", categoria: "" });
+            setServiceOptions([]);
+            
+            // Recarregar a lista de serviços
+            await getServices();
+            
+            // Fechar o formulário (opcional)
+            // setMostrarFormulario(false);
+            
+        } catch (error) {
+        }
     }
 
     const iniciarEdicao = (produto: ServiceProps) => {
@@ -100,23 +184,28 @@ export default function ProdutosPage() {
         })
     }
 
-    const salvarEdicao = () => {
-        // if (editandoProduto && produtoEditado.nome && produtoEditado.valor && produtoEditado.categoria) {
-        //     setProdutos(
-        //         produtos.map((p) =>
-        //             p.id === editandoProduto
-        //                 ? {
-        //                     ...p,
-        //                     nome: produtoEditado.nome,
-        //                     valor: Number.parseFloat(produtoEditado.valor),
-        //                     categoria: produtoEditado.categoria,
-        //                 }
-        //                 : p,
-        //         ),
-        //     )
-        //     setEditandoProduto(null)
-        //     setProdutoEditado({ nome: "", valor: "", categoria: "" })
-        // }
+    const salvarEdicao = async () => {
+        if (!editandoProduto || !produtoEditado.price) {
+            alert("Preço é obrigatório");
+            return;
+        }
+
+        try {
+            const payload = {
+                price: produtoEditado.price
+            };
+
+            await updateService(editandoProduto, payload);
+            
+            // Limpar estado de edição
+            setEditandoProduto(null);
+            setProdutoEditado({ service: "", price: "", categoria: "" });
+            
+            // Recarregar a lista de serviços
+            await getServices();
+            
+        } catch (error) {
+        }
     }
 
     const cancelarEdicao = () => {
@@ -124,13 +213,23 @@ export default function ProdutosPage() {
         setProdutoEditado({ service: "", price: "", categoria: "" })
     }
 
-    const excluirProduto = (id: string) => {
-        // setProdutos(produtos.filter((p) => p.id !== id))
+    const excluirProduto = async (id: string) => {
+        await removeService(id);
+        // Recarregar a lista de serviços
+        await getServices();
     }
 
     const limparFiltro = () => {
         setFiltro("")
     }
+
+    // Resetar estados quando fechar o formulário
+    useEffect(() => {
+        if (!mostrarFormulario) {
+            setNovoProduto({ service: "", price: "", categoria: "" })
+            setServiceOptions([])
+        }
+    }, [mostrarFormulario])
 
     // Carrega categorias quando o formulário é aberto
     useEffect(() => {
@@ -166,21 +265,28 @@ export default function ProdutosPage() {
                     <h3 className="text-lg font-semibold mb-4">Novo Serviço</h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="nome">Nome do Serviço</Label>
-                            <Input
-                                id="nome"
-                                placeholder="Digite o nome do serviço"
-                                value={novoProduto.service}
-                                onChange={(e) => setNovoProduto({ ...novoProduto, service: e.target.value })}
-                            />
-                        </div>
-                        <div className="space-y-2">
                             <Label htmlFor="categoria">Categoria</Label>
                             <SelectWithSearch
                                 options={categoriaOptions}
                                 value={novoProduto.categoria}
-                                onValueChange={(value) => setNovoProduto({ ...novoProduto, categoria: value })}
+                                onValueChange={handleCategoriaChange}
                                 placeholder="Selecione uma categoria"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="service">Serviço</Label>
+                            <SelectWithSearch
+                                options={serviceOptions}
+                                value={novoProduto.service}
+                                onValueChange={handleServiceChange}
+                                placeholder={
+                                    loadingServices 
+                                        ? "Carregando serviços..." 
+                                        : !novoProduto.categoria 
+                                        ? "Selecione uma categoria primeiro"
+                                        : "Selecione um serviço"
+                                }
+                                disabled={!novoProduto.categoria || loadingServices}
                             />
                         </div>
                         <div className="space-y-2">
@@ -192,6 +298,7 @@ export default function ProdutosPage() {
                                 placeholder="0,00"
                                 value={novoProduto.price}
                                 onChange={(e) => setNovoProduto({ ...novoProduto, price: e.target.value })}
+                                disabled={!novoProduto.service}
                             />
                         </div>
                     </div>
@@ -209,6 +316,7 @@ export default function ProdutosPage() {
                             onClick={() => {
                                 setMostrarFormulario(false)
                                 setNovoProduto({ service: "", price: "", categoria: "" })
+                                setServiceOptions([])
                             }}
                             className="sm:flex-1"
                         >
@@ -284,34 +392,22 @@ export default function ProdutosPage() {
                                         <TableCell className="font-medium">{produto.id_company_service}</TableCell>
                                         <TableCell>
                                             {editandoProduto === produto.id_company_service ? (
-                                                <Input
-                                                    value={produtoEditado.service}
-                                                    onChange={(e) => setProdutoEditado({ ...produtoEditado, service: e.target.value })}
-                                                    className="max-w-xs"
-                                                />
+                                                <span className="text-foreground">
+                                                    {produto.service}
+                                                </span>
                                             ) : (
-                                                <span
-                                                    className="cursor-pointer hover:text-primary transition-colors"
-                                                    onClick={() => iniciarEdicao(produto)}
-                                                >
+                                                <span className="text-foreground">
                                                     {produto.service}
                                                 </span>
                                             )}
                                         </TableCell>
                                         <TableCell>
                                             {editandoProduto === produto.id_company_service ? (
-                                                <SelectWithSearch
-                                                    options={categoriaOptions}
-                                                    value={produtoEditado.categoria}
-                                                    onValueChange={(value) => setProdutoEditado({ ...produtoEditado, categoria: value })}
-                                                    placeholder="Selecione uma categoria"
-                                                    className="max-w-xs"
-                                                />
+                                                <span className="text-foreground">
+                                                    {produto.categoria}
+                                                </span>
                                             ) : (
-                                                <span
-                                                    className="cursor-pointer hover:text-primary transition-colors"
-                                                    onClick={() => iniciarEdicao(produto)}
-                                                >
+                                                <span className="text-foreground">
                                                     {produto.categoria}
                                                 </span>
                                             )}
@@ -384,17 +480,11 @@ export default function ProdutosPage() {
                                                 Categoria
                                             </span>
                                             {editandoProduto === produto.id_company_service ? (
-                                                <SelectWithSearch
-                                                    options={categoriaOptions}
-                                                    value={produtoEditado.categoria}
-                                                    onValueChange={(value) => setProdutoEditado({ ...produtoEditado, categoria: value })}
-                                                    placeholder="Selecione uma categoria"
-                                                />
+                                                <span className="text-foreground block">
+                                                    {produto.categoria}
+                                                </span>
                                             ) : (
-                                                <span
-                                                    className="cursor-pointer hover:text-primary transition-colors block"
-                                                    onClick={() => iniciarEdicao(produto)}
-                                                >
+                                                <span className="text-foreground block">
                                                     {produto.categoria}
                                                 </span>
                                             )}
@@ -408,16 +498,11 @@ export default function ProdutosPage() {
                                                 Serviço
                                             </span>
                                             {editandoProduto === produto.id_company_service ? (
-                                                <Input
-                                                    value={produtoEditado.service}
-                                                    onChange={(e) => setProdutoEditado({ ...produtoEditado, service: e.target.value })}
-                                                    className="w-full text-center"
-                                                />
+                                                <span className="text-foreground block">
+                                                    {produto.service}
+                                                </span>
                                             ) : (
-                                                <span
-                                                    className="cursor-pointer hover:text-primary transition-colors block"
-                                                    onClick={() => iniciarEdicao(produto)}
-                                                >
+                                                <span className="text-foreground block">
                                                     {produto.service}
                                                 </span>
                                             )}
