@@ -190,31 +190,31 @@ export const fakeBudgetsPageBudgets: CardBudgetProps[] = [
     {
         index: '#101',
         name: 'José Silva',
-        serives: 'Troca de oleo, troca pneu',
+        services: 'Troca de oleo, troca pneu',
         status: "Pendente"
     },
     {
         index: '#111',
         name: 'Alvares Dornelas',
-        serives: 'Martelinho',
+        services: 'Martelinho',
         status: "Respondido"
     },
     {
         index: '#125',
         name: 'Juliana Camargo',
-        serives: 'Alinhamento',
+        services: 'Alinhamento',
         status: "Cancelado"
     },
     {
         index: '#058',
         name: 'Fulano de Tal',
-        serives: 'Reparo motor',
+        services: 'Reparo motor',
         status: "Respondido"
     },
     {
         index: '#001',
         name: 'Umestranho Qualquer',
-        serives: 'Algum serviço, outro serviço',
+        services: 'Algum serviço, outro serviço',
         status: "Pendente"
     },
 ]
