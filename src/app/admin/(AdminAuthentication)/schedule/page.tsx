@@ -1,9 +1,27 @@
+import { AgendaView } from "@/components/agenda-view";
+
 interface SchedulePageProps {
 
 }
 
 export default function SchedulePage({ }: SchedulePageProps) {
     return (
-        <div><h2>Schedule Admin: Preciso de uma ideia de como será o retorno da api para começar a trabalhar melhor nessa página</h2></div>
+        <div>
+            <AgendaView
+                compromissos={
+                    [
+                        {
+                            data: "2025-10-24",
+                            hora: "10:00",
+                            nome: "Revisão de Código",
+                        },
+                        {
+                            data: "2025-10-24",
+                            hora: "15:00",
+                            nome: "Planejamento Sprint",
+                        },
+                    ]
+                } />
+        </div>
     )
 }

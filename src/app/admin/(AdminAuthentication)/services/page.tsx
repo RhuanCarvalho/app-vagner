@@ -92,7 +92,7 @@ export default function ProdutosPage() {
             service: "", // Limpa o serviço selecionado quando muda a categoria
             price: "" // Limpa o preço quando muda a categoria
         })
-        
+
         if (categoria_id) {
             carregarServicosPorCategoria(categoria_id)
         } else {
@@ -120,7 +120,7 @@ export default function ProdutosPage() {
         if (!filtro.trim()) return true;
 
         const termoBusca = normalizarTexto(filtro);
-        
+
         // Normaliza os dados do produto para comparação
         const idNormalizado = normalizarTexto(produto.id_company_service);
         const serviceNormalizado = normalizarTexto(produto.service);
@@ -144,7 +144,7 @@ export default function ProdutosPage() {
     //         price: number
     //     }
     //     await addService(payloadAddServiceProps)
-        
+
     // }
 
     const adicionarProduto = async () => {
@@ -160,17 +160,17 @@ export default function ProdutosPage() {
             };
 
             await addService(payload);
-            
+
             // Limpar formulário após adicionar
             setNovoProduto({ service: "", price: "", categoria: "" });
             setServiceOptions([]);
-            
+
             // Recarregar a lista de serviços
             await getServices();
-            
+
             // Fechar o formulário (opcional)
             // setMostrarFormulario(false);
-            
+
         } catch (error) {
         }
     }
@@ -196,14 +196,14 @@ export default function ProdutosPage() {
             };
 
             await updateService(editandoProduto, payload);
-            
+
             // Limpar estado de edição
             setEditandoProduto(null);
             setProdutoEditado({ service: "", price: "", categoria: "" });
-            
+
             // Recarregar a lista de serviços
             await getServices();
-            
+
         } catch (error) {
         }
     }
@@ -244,12 +244,20 @@ export default function ProdutosPage() {
 
     return (
         <div className="container mx-auto p-4 w-full overflow-y-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div className="flex items-center gap-3">
-                    <Package className="h-6 w-6 text-gray-600" />
-                    <h1 className="text-lg font-bold text-gray-600">Listagem de Serviços</h1>
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="flex justify-between items-center py-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Serviços</h1>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Gerencie todos os serviços do sistema
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <Button
                     onClick={() => setMostrarFormulario(!mostrarFormulario)}
                     className="flex items-center gap-2 bg-[#002547] text-white w-full sm:w-auto"
@@ -280,11 +288,11 @@ export default function ProdutosPage() {
                                 value={novoProduto.service}
                                 onValueChange={handleServiceChange}
                                 placeholder={
-                                    loadingServices 
-                                        ? "Carregando serviços..." 
-                                        : !novoProduto.categoria 
-                                        ? "Selecione uma categoria primeiro"
-                                        : "Selecione um serviço"
+                                    loadingServices
+                                        ? "Carregando serviços..."
+                                        : !novoProduto.categoria
+                                            ? "Selecione uma categoria primeiro"
+                                            : "Selecione um serviço"
                                 }
                                 disabled={!novoProduto.categoria || loadingServices}
                             />
@@ -353,7 +361,7 @@ export default function ProdutosPage() {
                         {servicosFiltrados.length} serviço{servicosFiltrados.length !== 1 ? 's' : ''} encontrado{servicosFiltrados.length !== 1 ? 's' : ''}
                         {servicosFiltrados.length !== services.length && ` de ${services.length}`}
                     </p>
-                ): <p className="text-sm text-muted-foreground mt-2">Digite para filtrar...</p>
+                ) : <p className="text-sm text-muted-foreground mt-2">Digite para filtrar...</p>
                 }
             </div>
 
