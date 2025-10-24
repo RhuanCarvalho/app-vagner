@@ -22,7 +22,7 @@ export const CardBudget = ({ index, name, services, status }: CardBudgetProps) =
         >
             <div className="flex flex-col gap-2 flex-1 min-w-0">
                 <div className="flex gap-2 items-center">
-                    <p className="font-bold text-gray-600 whitespace-nowrap">#{index}</p>
+                    <p className="font-bold text-gray-600 whitespace-nowrap">{index}</p>
                     <p className="font-semibold text-[14px] text-gray-600 truncate">{name}</p>
                 </div>
                 <p className="text-[14px] text-gray-600 truncate">Serviços: {services}</p>
