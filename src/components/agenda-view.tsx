@@ -146,7 +146,7 @@ export function AgendaView({ compromissos }: AgendaViewProps) {
                     key={day.toISOString()}
                     onClick={() => setSelectedDate(day)}
                     className={cn(
-                      "relative flex aspect-square flex-col items-center justify-center rounded-lg p-1 text-sm font-medium transition-colors",
+                      "relative flex aspect-video flex-col items-center justify-center rounded-lg p-1 text-sm font-medium transition-colors",
                       "hover:bg-gray-100",
                       isSelected && "bg-[#002547] text-white hover:bg-[#001a36]",
                       !isSelected && isCurrentDay && "border-2 border-[#002547]",
