@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css";
@@ -19,8 +19,16 @@ const geistMono = Geist_Mono({
 const _inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Car"
+  title: "Car",
 };
+
+// ✅ SOLUÇÃO: Adicione esta constante viewport
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+}
 
 export default function RootLayout({
   children,
@@ -30,12 +38,6 @@ export default function RootLayout({
   const keyGa = process.env.NEXT_PUBLIC_KEY_GOOGLE_ANALYTICS as string
   return (
     <html lang="en">
-      <head>
-        <meta 
-          name="viewport" 
-          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" 
-        />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased ${_inter.className}`}
       >
