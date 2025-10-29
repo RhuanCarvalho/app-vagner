@@ -197,24 +197,24 @@ export const fakeBudgetsPageBudgets: CardBudgetProps[] = [
         index: '#111',
         name: 'Alvares Dornelas',
         services: 'Martelinho',
-        status: "Respondido"
+        status: "Finalizado"
     },
     {
         index: '#125',
         name: 'Juliana Camargo',
         services: 'Alinhamento',
-        status: "Cancelado"
+        status: "Pendente"
     },
     {
         index: '#058',
         name: 'Fulano de Tal',
         services: 'Reparo motor',
-        status: "Respondido"
+        status: "Recusado"
     },
     {
         index: '#001',
         name: 'Umestranho Qualquer',
         services: 'Algum serviço, outro serviço',
-        status: "Pendente"
+        status: "Aguardando confirmação de nova data"
     },
 ]
