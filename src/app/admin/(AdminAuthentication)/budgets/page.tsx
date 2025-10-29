@@ -171,7 +171,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-lg">
                             <div className="flex items-center gap-3">
                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                                <span className="text-gray-700">Carregando orçamentos...</span>
+                                <span className="text-gray-700">Carregando...</span>
                             </div>
                         </div>
                     </div>

@@ -19,10 +19,9 @@ const geistMono = Geist_Mono({
 const _inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Car",
+  title: "Copiloto",
 };
 
-// ✅ SOLUÇÃO: Adicione esta constante viewport
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
