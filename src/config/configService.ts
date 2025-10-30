@@ -38,17 +38,17 @@ api.interceptors.request.use(
 );
 
 // Interceptor para tratar erros de autenticação
-api.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response?.status === 401) {
-            // Token expirado ou inválido - faz logout
-            if (typeof window !== 'undefined') {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-                window.location.href = '/asmin/login';
-            }
-        }
-        return Promise.reject(error);
-    }
-);
+// api.interceptors.response.use(
+//     (response) => response,
+//     (error) => {
+//         if (error.response?.status === 401) {
+//             // Token expirado ou inválido - faz logout
+//             if (typeof window !== 'undefined') {
+//                 localStorage.removeItem('token');
+//                 localStorage.removeItem('user');
+//                 window.location.href = '/admin/login';
+//             }
+//         }
+//         return Promise.reject(error);
+//     }
+// );

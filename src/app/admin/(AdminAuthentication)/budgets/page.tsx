@@ -1,10 +1,11 @@
 'use client'
 
-import { fakeBudgetsPageBudgets } from "@/fakeData/fakeData";
 import { CardBudget } from "./components/Cards";
-import { useBudgets } from "@/services/adminServices/budgets/budgetsServices";
+import { BudgetsProps, useBudgets } from "@/services/adminServices/budgets/budgetsServices";
 import { useEffect, useState } from "react";
 import { StatusType } from "./components/Status";
+import { useUser } from "@/services/adminServices/login/loginServices";
+import { OpenBudget } from "./openBudget/openBudget";
 
 interface BudgetsPageProps { }
 
@@ -16,7 +17,8 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
     const [activeStatus, setActiveStatus] = useState<StatusType | 'all'>('all');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { state: { budgets }, actions: { getBudgets } } = useBudgets();
+    const { state: { budgets }, actions: { getBudgets, setBudgetOpen } } = useBudgets();
+    const { state: { user } } = useUser();
 
     useEffect(() => {
         (async () => {
@@ -123,6 +125,20 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
         ? statusColumns
         : statusColumns.filter(column => column.key === activeStatus);
 
+    const [openBudget, setOpenBudget] = useState<boolean>(false);
+    const handleOpenBudget = async (budget: BudgetsProps) => {
+        setBudgetOpen(budget,
+            {
+                code:'',
+                company:user?.id_company,
+                id: '',
+                id_estimate_service: budget.id_orcamento,
+                type: 'estimate',
+            }
+        )
+        setOpenBudget(true);
+    }
+
     return (
         <div className="min-h-screen ">
             {/* Header */}
@@ -191,8 +207,8 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                     onClick={() => handleStatusClick('all')}
                                     disabled={loading}
                                     className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all ${activeStatus === 'all'
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-gray-200 bg-white hover:border-gray-300'
                                         } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <span className={`text-sm font-medium ${activeStatus === 'all' ? 'text-blue-700' : 'text-gray-700'
@@ -201,8 +217,8 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                     </span>
                                     {activeStatus === 'all' &&
                                         <span className={`px-2 py-1 rounded-full text-xs ${activeStatus === 'all'
-                                                ? 'bg-blue-100 text-blue-800'
-                                                : 'bg-gray-100 text-gray-600'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-600'
                                             }`}>
                                             {totalItems}
                                         </span>}
@@ -215,20 +231,20 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                         onClick={() => handleStatusClick(column.key)}
                                         disabled={loading}
                                         className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all ${activeStatus === column.key
-                                                ? `${column.color.replace('bg-', 'border-').replace('-50', '-500')} ${column.color}`
-                                                : 'border-gray-200 bg-white hover:border-gray-300'
+                                            ? `${column.color.replace('bg-', 'border-').replace('-50', '-500')} ${column.color}`
+                                            : 'border-gray-200 bg-white hover:border-gray-300'
                                             } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className={`text-sm font-medium ${activeStatus === column.key
-                                                ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
-                                                : 'text-gray-700'
+                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
+                                            : 'text-gray-700'
                                             }`}>
                                             {column.title}
                                         </span>
                                         {activeStatus === column.key &&
                                             <span className={`px-2 py-1 rounded-full text-xs ${activeStatus === column.key
-                                                    ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
-                                                    : 'bg-gray-100 text-gray-600'
+                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
+                                                : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {column.count}
                                             </span>}
@@ -253,8 +269,8 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                     onClick={() => handleStatusClick('all')}
                                     disabled={loading}
                                     className={`flex items-center justify-between px-4 py-2 rounded-lg border-2 transition-all ${activeStatus === 'all'
-                                            ? 'border-blue-500 bg-blue-50'
-                                            : 'border-gray-200 bg-white hover:border-gray-300'
+                                        ? 'border-blue-500 bg-blue-50'
+                                        : 'border-gray-200 bg-white hover:border-gray-300'
                                         } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <span className={`text-sm font-medium ${activeStatus === 'all' ? 'text-blue-700' : 'text-gray-700'
@@ -263,8 +279,8 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                     </span>
                                     {activeStatus === 'all' &&
                                         <span className={`px-2 py-1 rounded-full text-xs ml-2 ${activeStatus === 'all'
-                                                ? 'bg-blue-100 text-blue-800'
-                                                : 'bg-gray-100 text-gray-600'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-600'
                                             }`}>
                                             {totalItems}
                                         </span>}
@@ -277,20 +293,20 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                         onClick={() => handleStatusClick(column.key)}
                                         disabled={loading}
                                         className={`flex items-center justify-between px-4 py-2 rounded-lg border-2 transition-all ${activeStatus === column.key
-                                                ? `${column.color.replace('bg-', 'border-').replace('-50', '-500')} ${column.color}`
-                                                : 'border-gray-200 bg-white hover:border-gray-300'
+                                            ? `${column.color.replace('bg-', 'border-').replace('-50', '-500')} ${column.color}`
+                                            : 'border-gray-200 bg-white hover:border-gray-300'
                                             } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className={`text-sm font-medium ${activeStatus === column.key
-                                                ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
-                                                : 'text-gray-700'
+                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
+                                            : 'text-gray-700'
                                             }`}>
                                             {column.title}
                                         </span>
                                         {activeStatus === column.key &&
                                             <span className={`px-2 py-1 rounded-full text-xs ml-2 ${activeStatus === column.key
-                                                    ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
-                                                    : 'bg-gray-100 text-gray-600'
+                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
+                                                : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {column.count}
                                             </span>}
@@ -327,6 +343,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                     name={bud.car}
                                     services={bud.services.map(serv => serv.service).join(', ')}
                                     status={statusMap[Number(bud.status)] || "Pendente"}
+                                    onClick={() => handleOpenBudget(bud)}
                                 />
                             ))}
                         </div>
@@ -381,6 +398,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                                     name={bud.car}
                                                     services={bud.services.map(serv => serv.service).join(', ')}
                                                     status={column.key}
+                                                    onClick={() => handleOpenBudget(bud)}
                                                 />
                                             ))
                                         )}
@@ -540,6 +558,9 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                     </div>
                 </>
             )}
+            {openBudget &&
+                <OpenBudget  isOpen={openBudget} closeInX={() => setOpenBudget(false)}/>
+            }
         </div>
     )
 }

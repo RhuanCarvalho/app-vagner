@@ -5,11 +5,13 @@ export interface CardBudgetProps {
     name: string;
     services: string;
     status: StatusType;
+    onClick?: () => void;
 }
 
-export const CardBudget = ({ index, name, services, status }: CardBudgetProps) => {
+export const CardBudget = ({ index, name, services, status, onClick }: CardBudgetProps) => {
     return (
         <div
+            onClick={onClick}
             className={`
                 flex justify-between items-center shadow-lg shadow-gray-200 w-full p-4
                 hover:scale-[1.02] cursor-pointer

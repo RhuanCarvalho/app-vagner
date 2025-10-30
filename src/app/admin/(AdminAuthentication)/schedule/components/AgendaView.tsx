@@ -16,8 +16,10 @@ import {
 import { ptBR } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { CompromissosProps, useSchedules } from "@/services/adminServices/schedule/scheduleServices"
+import { ModalViewInfoSchedule } from "../ViewInfoSchedule/viewInfoSchedule"
+import { ServiceForm } from "../../budgets/openBudget/openBudget"
 
-interface AgendaViewProps {}
+interface AgendaViewProps { }
 
 export function AgendaView({ }: AgendaViewProps) {
   const { state: { compromissos }, actions: { getSchedulesPeriod } } = useSchedules();
@@ -105,6 +107,14 @@ export function AgendaView({ }: AgendaViewProps) {
     setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))
   }
 
+  const [selectedSchedule, setSelectedSchedule] = useState<CompromissosProps>({} as CompromissosProps);
+
+  const [openDetailsSchedule, setOpenDetailsSchedule] = useState<boolean>(false);
+  const openViewDetailsSchedule = (compromisso: CompromissosProps) => {
+    setSelectedSchedule(compromisso);
+    setOpenDetailsSchedule(true);
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Loading Overlay */}
@@ -132,7 +142,7 @@ export function AgendaView({ }: AgendaViewProps) {
           </div>
         </div>
       </div>
-      
+
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-2">
           {/* Calendário */}
@@ -244,6 +254,7 @@ export function AgendaView({ }: AgendaViewProps) {
               ) : (
                 compromissosDodia.map((comp, index) => (
                   <div
+                    onClick={() => openViewDetailsSchedule(comp)}
                     key={index}
                     className="border border-gray-100 rounded-lg hover:scale-[1.02] shadow-lg shadow-gray-200 bg-white p-3 transition-all hover:shadow-lg"
                   >
@@ -253,12 +264,12 @@ export function AgendaView({ }: AgendaViewProps) {
                         <p className="text-[12px] text-gray-600 w-full">Serviços: {comp.services.map(serv => serv.service).join(', ')}</p>
                         <p className={"flex items-center justify-center text-[14px] py-1 px-2 rounded-lg font-bold whitespace-nowrap w-max bg-green-200 text-green-900"}
                           title={comp.schedule_period} // Tooltip com o texto completo
-                          >
+                        >
                           <span className="pr-3"><Clock className="h-5 w-5 text-[#002547]" /></span>
                           <span>{comp.schedule_period}</span>
                           <span className="px-2">•</span>
                           <span>{format(parseISO(comp.schedule_date), "EEEE", { locale: ptBR })}</span>
-                      </p>
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -268,6 +279,24 @@ export function AgendaView({ }: AgendaViewProps) {
           </Card>
         </div>
       </div>
+      {openDetailsSchedule &&
+        <ModalViewInfoSchedule
+          isOpen={openDetailsSchedule}
+          onClose={() => setOpenDetailsSchedule(false)}
+          schedule={selectedSchedule}
+          services={selectedSchedule.services as ServiceForm[]}
+          total={selectedSchedule.services.reduce((sum, service) => sum + Number(service.value || 0), 0)}
+          date={
+            {
+              original: {
+                date: selectedSchedule.schedule_date,
+                period: selectedSchedule.schedule_period
+              },
+              suggested: []
+            }
+          }
+        />
+      }
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { create } from "zustand";
 interface ServicesInSchedulesProps {
     id_service_item: string;
     service: string;
-    value: string;
+    value: string | number;
 }
 interface OptionsDatesInSchedulesProps {
     date: string;
