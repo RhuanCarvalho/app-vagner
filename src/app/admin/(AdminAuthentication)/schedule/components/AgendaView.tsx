@@ -156,21 +156,21 @@ export function AgendaView({ }: AgendaViewProps) {
                   <button
                     onClick={goToPreviousMonth}
                     disabled={loading}
-                    className="rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {"←"}
                   </button>
                   <button
                     onClick={goToToday}
                     disabled={loading}
-                    className="rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Hoje
                   </button>
                   <button
                     onClick={goToNextMonth}
                     disabled={loading}
-                    className="rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="cursor-pointer rounded-lg px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {"→"}
                   </button>
@@ -206,6 +206,7 @@ export function AgendaView({ }: AgendaViewProps) {
                     onClick={() => setSelectedDate(day)}
                     disabled={loading}
                     className={cn(
+                      "cursor-pointer",
                       "relative flex aspect-video flex-col items-center justify-center rounded-lg p-1 text-sm font-medium transition-colors",
                       "hover:bg-gray-100",
                       isSelected && "bg-[#002547] text-white hover:bg-[#001a36]",
@@ -256,7 +257,7 @@ export function AgendaView({ }: AgendaViewProps) {
                   <div
                     onClick={() => openViewDetailsSchedule(comp)}
                     key={index}
-                    className="border border-gray-100 rounded-lg hover:scale-[1.02] shadow-lg shadow-gray-200 bg-white p-3 transition-all hover:shadow-lg"
+                    className="border border-gray-100 rounded-lg hover:scale-[1.02] shadow-lg shadow-gray-200 bg-white p-3 transition-all hover:shadow-lg cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
                       <div className="flex-1 space-y-1">
