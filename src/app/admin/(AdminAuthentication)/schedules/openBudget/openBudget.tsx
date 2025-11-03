@@ -161,8 +161,8 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
         // Adicionar o campo adicional
         formData.append("additionalInfo", additionalInfo);
         formData.append("type", checkinData.type!);
-        formData.append("id", budget.id_vehicle!);
-        // formData.append("company", checkinData.company!);
+        formData.append("id", checkinData.id!);
+        formData.append("company", checkinData.company!);
         formData.append("id_estimate_service", checkinData.id_estimate_service!);
 
         // Adicionar os arquivos ao FormData

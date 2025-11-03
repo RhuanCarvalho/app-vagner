@@ -20,6 +20,7 @@ export interface ServicesBudgetsProps {
 export interface BudgetsProps {
     codigo: string;
     id_orcamento: string;
+    id_vehicle?: string,
     status: string;
     label_status: string;
     car: string;
@@ -40,6 +41,7 @@ interface ServicesBudgetProps {
 interface Budget {
     status: string;
     label_status: string;
+    id_vehicle?: string,
     car: string;
     km: string;
     genero: string;
@@ -113,6 +115,7 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
                         budget: {
                             status: budget.status,
                             label_status: budget.label_status,
+                            id_vehicle: budget.id_vehicle,
                             car: budget.car,
                             km: budget.km,
                             genero: '', // Faltou essa Informação
@@ -132,7 +135,7 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
         },
         sendBudget: async (sendJson: any) => {
             try {
-                const { data } = await apiAdmin.post('/copiloto/index.php/company/estimate_response', sendJson,
+                const { data } = await apiAdmin.post('/copiloto/index.php/provider/answer', sendJson,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -142,9 +145,21 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
                 if (data.message) {
                     set((state) => ({ state: { ...state.state, retornoMessageAPI: data.message } }))
                 }
+                if (data.success){
+                    toast.success(data.message || "Orçamento respondido com sucesso!", {
+                        draggable: false,
+                    });
+                }else{
+                    toast.error(data.message || "Houve algum problema, tente novamente!", {
+                        draggable: false,
+                    });
+                }
                 return true;
             }
             catch (err) {
+                toast.error("Houve algum problema, tente novamente!", {
+                    draggable: false,
+                });
                 return false;
             }
         },

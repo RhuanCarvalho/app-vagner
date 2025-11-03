@@ -130,7 +130,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
         setBudgetOpen(budget,
             {
                 code:'',
-                company: user?.id_company,
+                company:user?.id_company,
                 id: '',
                 id_estimate_service: budget.id_orcamento,
                 type: 'estimate',
@@ -146,9 +146,9 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center py-6 max-md:flex-col max-md:items-start max-md:gap-4">
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Orçamentos</h1>
+                            <h1 className="text-3xl font-bold text-gray-900">Agendamentos</h1>
                             <p className="mt-1 text-sm text-gray-500">
-                                Gerencie todos os orçamentos do sistema
+                                Gerencie todos os agendamentos do sistema
                             </p>
                         </div>
                         <div className="flex justify-end gap-4 max-md:justify-between max-md:w-full">

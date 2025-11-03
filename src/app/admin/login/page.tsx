@@ -24,7 +24,7 @@ export default function LoginPage({ }: LoginPageProps) {
     useEffect(() => {
         if (authenticated && !hasRedirected.current) {
             hasRedirected.current = true;
-            router.push("/admin/home");
+            router.push("/admin/budgets");
         }
     }, [authenticated, router]);
 
@@ -41,7 +41,7 @@ export default function LoginPage({ }: LoginPageProps) {
         });
         
         if (isAuthenticated) {
-            router.push("/admin/home");
+            router.push("/admin/budgets");
         }
     }
 
