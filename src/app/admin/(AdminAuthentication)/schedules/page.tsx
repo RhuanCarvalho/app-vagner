@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { StatusType } from "./components/Status";
 import { useUser } from "@/services/adminServices/login/loginServices";
 import { OpenBudget } from "./openBudget/openBudget";
+import { useSchedules } from "@/services/adminServices/schedules/schedulesServices";
 
 interface BudgetsPageProps { }
 
@@ -17,7 +18,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
     const [activeStatus, setActiveStatus] = useState<StatusType | 'all'>('all');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const { state: { budgets }, actions: { getBudgets, setBudgetOpen } } = useBudgets();
+    const { state: { budgets }, actions: { getBudgets, setBudgetOpen } } = useSchedules();
     const { state: { user } } = useUser();
 
     useEffect(() => {
@@ -133,7 +134,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                 company:user?.id_company,
                 id: '',
                 id_estimate_service: budget.id_orcamento,
-                type: 'estimate',
+                type: 'schedule',
             }
         )
         setOpenBudget(true);

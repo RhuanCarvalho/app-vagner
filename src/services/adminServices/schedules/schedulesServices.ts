@@ -84,7 +84,7 @@ interface useBudgetsProps {
 }
 
 
-export const useBudgets = create<useBudgetsProps>((set, get) => ({
+export const useSchedules = create<useBudgetsProps>((set, get) => ({
     state: {
         budgets: [],
         budget: {} as Budget,
@@ -99,7 +99,7 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
             status: number | undefined = undefined
         ) => {
             try {
-                const { data: { data } } = await apiAdmin.get("/copiloto/index.php/provider/estimates", {
+                const { data: { data } } = await apiAdmin.get("/copiloto/index.php/provider/schedules", {
                     params: {
                         page, per_page, 
                         ...(status !== undefined && { status })

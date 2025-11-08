@@ -10,6 +10,13 @@ export default function AdminLayout(
 
     const menu: itensProps[] = [
         {
+            value: 'home',
+            icon: <HomeIcon
+            className="size-5 text-gray-500"
+            />,
+            label: 'Home'
+        },
+        {
             value: 'budgets',
             icon: <BanknotesIcon
             className="size-5 text-gray-500"

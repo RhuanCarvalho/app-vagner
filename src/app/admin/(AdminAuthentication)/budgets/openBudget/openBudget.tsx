@@ -62,7 +62,7 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
         state: { budget, checkinData }, 
         actions: { 
             sendBudget, 
-            // RejectedService 
+            RejectedService 
         } 
     } = useBudgets()
     const [files, setFiles] = useState<FileWithPreview[]>([])
@@ -197,12 +197,12 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
 
     const rejectedBudget = () => {
         sendGAEvent('event', `botao_para_confirmar_declinar_orcamento`, {});
-        // RejectedService({
-        //     id: checkinData.id!,
-        //     type: checkinData.type!,
-        //     company: checkinData.company!,
-        //     id_estimate_service: checkinData.id_estimate_service!,
-        // })
+        RejectedService({
+            id: checkinData.id!,
+            type: checkinData.type!,
+            company: checkinData.company!,
+            id_estimate_service: checkinData.id_estimate_service!,
+        })
         setOk(true);
         setIsDecline(true);
     }
@@ -285,7 +285,7 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
                 xl:max-w-5xl
                 2xl:max-w-6xl
             '>
-                <div className="p-4 lg:p-6">
+                <div className="py-4 lg:py-6">
                     {!ok
                         ?
                         <>

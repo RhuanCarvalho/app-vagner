@@ -1,4 +1,5 @@
 import { useBudgets } from "@/services/adminServices/budgets/budgetsServices";
+import { useSchedules } from "@/services/adminServices/schedules/schedulesServices";
 
 interface ConfirmDeclineBugdgetProps {
     onClick: () => void;
@@ -7,7 +8,7 @@ interface ConfirmDeclineBugdgetProps {
 
 export const ConfirmDeclineBugdget = ({ onClick }: ConfirmDeclineBugdgetProps) => {
 
-    const { state: { retornoMessageAPI }, actions: { cleanMessage }} = useBudgets();
+    const { state: { retornoMessageAPI }, actions: { cleanMessage }} = useSchedules();
 
     const handleOnClick = () => {
         onClick();
