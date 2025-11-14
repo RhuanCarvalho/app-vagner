@@ -1,3 +1,4 @@
+import { StatusType } from "@/app/admin/(AdminAuthentication)/budgets/components/Status";
 import { MediaItem } from "@/components/galleryMedias";
 import { apiAdmin } from "@/config/configService";
 import { toast } from "react-toastify";
@@ -22,7 +23,7 @@ export interface BudgetsProps {
     id_orcamento: string;
     id_vehicle?: string,
     status: string;
-    label_status: string;
+    label_status: StatusType;
     car: string;
     km: string;
     approval_expires_at: string;
@@ -30,6 +31,8 @@ export interface BudgetsProps {
     options_dates: any[];
     services: ServicesBudgetsProps[];
     media: any[];
+    concorrencia: boolean;
+    type: string;
 }
 
 interface ServicesBudgetProps {
@@ -53,7 +56,8 @@ interface Budget {
     media: MediaItem[];
     company_name: string;
     company_image: string;
-    options_dates: { date: string, periodo: string}[]
+    options_dates: { date: string, periodo: string}[];
+    type: string;
 }
 
 interface DataRejectedBudget {
@@ -128,6 +132,7 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
                             company_name: '', // Faltou essa informação
                             company_image: '', // Faltou essa informação
                             options_dates: budget.options_dates, 
+                            type: budget.type
                         },
                         checkinData,
                     }

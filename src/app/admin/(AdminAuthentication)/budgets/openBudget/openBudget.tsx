@@ -160,7 +160,7 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
 
         // Adicionar o campo adicional
         formData.append("additionalInfo", additionalInfo);
-        formData.append("type", checkinData.type!);
+        formData.append("type", budget.type!);
         formData.append("id", budget.id_vehicle!);
         // formData.append("company", checkinData.company!);
         formData.append("id_estimate_service", checkinData.id_estimate_service!);
@@ -199,7 +199,7 @@ export const OpenBudget = ({ isOpen, closeInX}: BudgetCreatePageProps) => {
         sendGAEvent('event', `botao_para_confirmar_declinar_orcamento`, {});
         RejectedService({
             id: checkinData.id!,
-            type: checkinData.type!,
+            type: budget.type!,
             company: checkinData.company!,
             id_estimate_service: checkinData.id_estimate_service!,
         })

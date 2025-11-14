@@ -1,14 +1,15 @@
-import { Status, StatusType } from "./Status";
+import { Status, StatusConcorrencia, StatusType } from "./Status";
 
 export interface CardBudgetProps {
     index: string;
     name: string;
     services: string;
+    concorrencia: boolean; 
     status: StatusType;
     onClick?: () => void;
 }
 
-export const CardBudget = ({ index, name, services, status, onClick }: CardBudgetProps) => {
+export const CardBudget = ({ index, name, services, status, concorrencia, onClick }: CardBudgetProps) => {
     return (
         <div
             onClick={onClick}
@@ -30,8 +31,10 @@ export const CardBudget = ({ index, name, services, status, onClick }: CardBudge
                 </div>
                 <p className="text-[14px] text-gray-600 w-full">Serviços: {services}</p>
             </div>
-            <div className="w-full justify-start">
+            <div className=" flex w-full justify-between gap-1">
                 <Status nameStatus={status} />
+                {concorrencia && <StatusConcorrencia nameStatus="Orçamento em disputa"/>}
+
             </div>
         </div>
     )

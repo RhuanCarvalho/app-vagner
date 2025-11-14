@@ -38,17 +38,35 @@ api.interceptors.request.use(
 );
 
 // Interceptor para tratar erros de autenticação
-// api.interceptors.response.use(
-//     (response) => response,
-//     (error) => {
-//         if (error.response?.status === 401) {
-//             // Token expirado ou inválido - faz logout
-//             if (typeof window !== 'undefined') {
-//                 localStorage.removeItem('token');
-//                 localStorage.removeItem('user');
-//                 window.location.href = '/admin/login';
-//             }
-//         }
-//         return Promise.reject(error);
-//     }
-// );
+api.interceptors.response.use(
+    (response) => {
+        // Verifica se a resposta tem status 200 mas token expirado
+        if (response.data?.expired_token === true) {
+            // Token expirado - faz logout
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/admin/login';
+            }
+            // Rejeita a promise para não propagar a resposta
+            return Promise.reject(new Error('Token expirado'));
+        }
+        return response;
+    },
+    // (error) => {
+    //     // Trata erros HTTP (como 401)
+    //     if (error.response?.status === 401) {
+    //         handleLogout();
+    //     }
+    //     return Promise.reject(error);
+    // }
+);
+
+// Função auxiliar para logout
+const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/admin/login';
+    }
+};

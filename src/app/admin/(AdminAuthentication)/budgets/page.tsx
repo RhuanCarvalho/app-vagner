@@ -3,18 +3,22 @@
 import { CardBudget } from "./components/Cards";
 import { BudgetsProps, useBudgets } from "@/services/adminServices/budgets/budgetsServices";
 import { useEffect, useState } from "react";
-import { StatusType } from "./components/Status";
 import { useUser } from "@/services/adminServices/login/loginServices";
 import { OpenBudget } from "./openBudget/openBudget";
+
+export type StatusTypeGroup = 
+  | "Aguardando retorno do prestador"
+  | "Aguardando confirmação do cliente" 
+  | "Concluídos";
 
 interface BudgetsPageProps { }
 
 export default function BudgetsPage({ }: BudgetsPageProps) {
     const [page, setPage] = useState<number>(1);
     const [perPage, setPerPage] = useState<number>(10);
-    const [status, setStatus] = useState<1 | 2 | 3 | 4 | 5 | 11 | undefined>(undefined);
+    const [status, setStatus] = useState<777 | 888 | 999>(777);
     const [showFilters, setShowFilters] = useState<boolean>(false);
-    const [activeStatus, setActiveStatus] = useState<StatusType | 'all'>('all');
+    const [activeStatus, setActiveStatus] = useState<StatusTypeGroup>('Aguardando retorno do prestador');
     const [loading, setLoading] = useState<boolean>(false);
 
     const { state: { budgets }, actions: { getBudgets, setBudgetOpen } } = useBudgets();
@@ -36,55 +40,38 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
     const handleResetFilters = () => {
         setPage(1);
         setPerPage(10);
-        setStatus(undefined);
+        setStatus(777);
         setShowFilters(false);
-        setActiveStatus('all');
+        setActiveStatus('Aguardando retorno do prestador');
     };
 
     // Definir os status conforme fornecido
     const statusOptions = [
-        { value: undefined, label: "Todos os status" },
-        { value: 1, label: "Pendente" },
-        { value: 2, label: "Aguardando" },
-        { value: 3, label: "Agendado" },
-        { value: 4, label: "Finalizado" },
-        { value: 5, label: "Recusado" },
-        { value: 11, label: "Aguardando confirmação de nova data" }
+        { value: 777, label: "Aguardando retorno do prestador" },
+        { value: 888, label: "Aguardando confirmação do cliente" },
+        { value: 999, label: "Concluídos" }
     ];
 
-    const statusMap: Record<number, StatusType> = {
-        1: "Pendente",
-        2: "Aguardando",
-        3: "Agendado",
-        4: "Finalizado",
-        5: "Recusado",
-        11: "Aguardando confirmação de nova data"
+    const statusMap: Record<number, StatusTypeGroup> = {
+        777: "Aguardando retorno do prestador",
+        888: "Aguardando confirmação do cliente",
+        999: "Concluídos"
     };
 
     // Função para lidar com clique nos botões de status
-    const handleStatusClick = async (selectedStatus: StatusType | 'all') => {
+    const handleStatusClick = async (selectedStatus: StatusTypeGroup) => {
         setLoading(true);
         setActiveStatus(selectedStatus);
         setPage(1);
 
-        // Mapeia o StatusType para o valor numérico da API
-        let apiStatus: 1 | 2 | 3 | 4 | 5 | 11 | undefined;
+        // Mapeia o texto do status para o valor numérico da API
+        const statusMapToApi: Record<StatusTypeGroup, 777 | 888 | 999> = {
+            "Aguardando retorno do prestador": 777,
+            "Aguardando confirmação do cliente": 888,
+            "Concluídos": 999,
+        };
 
-        if (selectedStatus === 'all') {
-            apiStatus = undefined;
-        } else {
-            // Mapeia o texto do status para o valor numérico
-            const statusMapToApi: Record<StatusType, 1 | 2 | 3 | 4 | 5 | 11> = {
-                "Pendente": 1,
-                "Aguardando": 2,
-                "Aguardando confirmação de nova data": 11,
-                "Agendado": 3,
-                "Finalizado": 4,
-                "Recusado": 5,
-            };
-            apiStatus = statusMapToApi[selectedStatus];
-        }
-
+        const apiStatus = statusMapToApi[selectedStatus];
         setStatus(apiStatus);
         await getBudgets(1, perPage, apiStatus);
         setLoading(false);
@@ -95,35 +82,15 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
     const startItem = totalItems > 0 ? (page - 1) * perPage + 1 : 0;
     const endItem = Math.min(page * perPage, totalItems);
 
-    // Agrupar orçamentos por status para o Kanban
-    const budgetsByStatus = {
-        "Pendente": budgets.filter(bud => statusMap[Number(bud.status)] === "Pendente"),
-        "Aguardando": budgets.filter(bud => statusMap[Number(bud.status)] === "Aguardando"),
-        "Aguardando confirmação de nova data": budgets.filter(bud => statusMap[Number(bud.status)] === "Aguardando confirmação de nova data"),
-        "Agendado": budgets.filter(bud => statusMap[Number(bud.status)] === "Agendado"),
-        "Finalizado": budgets.filter(bud => statusMap[Number(bud.status)] === "Finalizado"),
-        "Recusado": budgets.filter(bud => statusMap[Number(bud.status)] === "Recusado"),
-    };
-
     // Definir cores para cada status
     const statusColumns = [
-        { key: "Pendente" as StatusType, title: "Pendente", count: budgetsByStatus["Pendente"].length, color: "bg-yellow-50 border-yellow-200" },
-        { key: "Aguardando" as StatusType, title: "Aguardando", count: budgetsByStatus["Aguardando"].length, color: "bg-blue-50 border-blue-200" },
-        { key: "Aguardando confirmação de nova data" as StatusType, title: "Aguardando confirmação de nova data", count: budgetsByStatus["Aguardando confirmação de nova data"].length, color: "bg-orange-50 border-orange-200" },
-        { key: "Agendado" as StatusType, title: "Agendado", count: budgetsByStatus["Agendado"].length, color: "bg-purple-50 border-purple-200" },
-        { key: "Finalizado" as StatusType, title: "Finalizado", count: budgetsByStatus["Finalizado"].length, color: "bg-green-50 border-green-200" },
-        { key: "Recusado" as StatusType, title: "Recusado", count: budgetsByStatus["Recusado"].length, color: "bg-red-50 border-red-200" },
+        { key: "Aguardando retorno do prestador" as StatusTypeGroup, title: "Aguardando retorno do prestador", count: budgets.length, color: "bg-yellow-50 border-yellow-200" },
+        { key: "Aguardando confirmação do cliente" as StatusTypeGroup, title: "Aguardando confirmação do cliente", count: budgets.length, color: "bg-blue-50 border-blue-200" },
+        { key: "Concluídos" as StatusTypeGroup, title: "Concluídos", count: budgets.length, color: "bg-green-50 border-green-200" },
     ];
 
-    // Orçamentos filtrados para mobile
-    const filteredBudgets = activeStatus === 'all'
-        ? budgets
-        : budgets.filter(bud => statusMap[Number(bud.status)] === activeStatus);
-
-    // Colunas filtradas para desktop Kanban
-    const filteredColumns = activeStatus === 'all'
-        ? statusColumns
-        : statusColumns.filter(column => column.key === activeStatus);
+    // Coluna ativa (agora só mostra uma coluna por vez)
+    const activeColumn = statusColumns.find(column => column.key === activeStatus);
 
     const [openBudget, setOpenBudget] = useState<boolean>(false);
     const handleOpenBudget = async (budget: BudgetsProps) => {
@@ -133,7 +100,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                 company: user?.id_company,
                 id: '',
                 id_estimate_service: budget.id_orcamento,
-                type: 'estimate',
+                type: budget.type,
             }
         )
         setOpenBudget(true);
@@ -159,11 +126,9 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                 <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     {perPage} por página
                                 </span>
-                                {status && (
-                                    <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                        {statusOptions.find(opt => opt.value === status)?.label}
-                                    </span>
-                                )}
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                    {statusOptions.find(opt => opt.value === status)?.label}
+                                </span>
                             </div>
                             {/* Botão Filtro - Mobile e Desktop */}
                             <button
@@ -201,29 +166,7 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                 <h3 className="text-sm font-medium text-gray-700">Filtrar por status:</h3>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-2">
-                                {/* Botão Todos */}
-                                <button
-                                    onClick={() => handleStatusClick('all')}
-                                    disabled={loading}
-                                    className={`flex items-center justify-between p-3 rounded-lg border-2 transition-all ${activeStatus === 'all'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 bg-white hover:border-gray-300'
-                                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    <span className={`text-sm font-medium ${activeStatus === 'all' ? 'text-blue-700' : 'text-gray-700'
-                                        }`}>
-                                        Todos
-                                    </span>
-                                    {activeStatus === 'all' &&
-                                        <span className={`px-2 py-1 rounded-full text-xs ${activeStatus === 'all'
-                                            ? 'bg-blue-100 text-blue-800'
-                                            : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {totalItems}
-                                        </span>}
-                                </button>
-
+                            <div className="grid grid-cols-1 gap-2">
                                 {/* Botões por Status */}
                                 {statusColumns.map((column) => (
                                     <button
@@ -236,18 +179,19 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                             } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className={`text-sm font-medium ${activeStatus === column.key
-                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
+                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-700`
                                             : 'text-gray-700'
                                             }`}>
                                             {column.title}
                                         </span>
                                         {activeStatus === column.key &&
                                             <span className={`px-2 py-1 rounded-full text-xs ${activeStatus === column.key
-                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
+                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-800`
                                                 : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {column.count}
-                                            </span>}
+                                            </span>
+                                        }
                                     </button>
                                 ))}
                             </div>
@@ -264,28 +208,6 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                             </div>
 
                             <div className="flex flex-wrap gap-2">
-                                {/* Botão Todos */}
-                                <button
-                                    onClick={() => handleStatusClick('all')}
-                                    disabled={loading}
-                                    className={`flex items-center justify-between px-4 py-2 rounded-lg border-2 transition-all ${activeStatus === 'all'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 bg-white hover:border-gray-300'
-                                        } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                >
-                                    <span className={`text-sm font-medium ${activeStatus === 'all' ? 'text-blue-700' : 'text-gray-700'
-                                        }`}>
-                                        Todos
-                                    </span>
-                                    {activeStatus === 'all' &&
-                                        <span className={`px-2 py-1 rounded-full text-xs ml-2 ${activeStatus === 'all'
-                                            ? 'bg-blue-100 text-blue-800'
-                                            : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                            {totalItems}
-                                        </span>}
-                                </button>
-
                                 {/* Botões por Status */}
                                 {statusColumns.map((column) => (
                                     <button
@@ -298,18 +220,19 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                                             } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className={`text-sm font-medium ${activeStatus === column.key
-                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-700`
+                                            ? `text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-700`
                                             : 'text-gray-700'
                                             }`}>
                                             {column.title}
                                         </span>
                                         {activeStatus === column.key &&
                                             <span className={`px-2 py-1 rounded-full text-xs ml-2 ${activeStatus === column.key
-                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('purple') ? 'purple' : column.color.includes('green') ? 'green' : column.color.includes('red') ? 'red' : 'orange'}-800`
+                                                ? `bg-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-100 text-${column.color.includes('yellow') ? 'yellow' : column.color.includes('blue') ? 'blue' : column.color.includes('green') ? 'green' : 'orange'}-800`
                                                 : 'bg-gray-100 text-gray-600'
                                                 }`}>
                                                 {column.count}
-                                            </span>}
+                                            </span>
+                                        }
                                     </button>
                                 ))}
                             </div>
@@ -317,32 +240,30 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                     </div>
                 </div>
 
-                {/* Mobile - Grid de Cards com Filtro */}
+                {/* Mobile - Grid de Cards */}
                 <div className="lg:hidden">
-                    {filteredBudgets.length === 0 ? (
+                    {budgets.length === 0 ? (
                         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
                             <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                {activeStatus === 'all' ? 'Nenhum orçamento encontrado' : `Nenhum orçamento ${activeStatus.toLowerCase()}`}
+                                {`Nenhum orçamento ${activeStatus.toLowerCase()}`}
                             </h3>
                             <p className="mt-2 text-sm text-gray-500">
-                                {activeStatus === 'all'
-                                    ? 'Tente ajustar os filtros para ver mais resultados.'
-                                    : 'Não há orçamentos com este status no momento.'
-                                }
+                                Não há orçamentos com este status no momento.
                             </p>
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {filteredBudgets.map((bud) => (
+                            {budgets.map((bud) => (
                                 <CardBudget
                                     key={bud.id_orcamento}
                                     index={bud.codigo}
                                     name={bud.car}
                                     services={bud.services.map(serv => serv.service).join(', ')}
-                                    status={statusMap[Number(bud.status)] || "Pendente"}
+                                    status={bud.label_status}
+                                    concorrencia={bud.concorrencia}
                                     onClick={() => handleOpenBudget(bud)}
                                 />
                             ))}
@@ -350,61 +271,40 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                     )}
                 </div>
 
-                {/* Versão Desktop - Kanban com Filtros */}
+                {/* Versão Desktop - Kanban */}
                 <div className="hidden lg:block">
-                    {filteredBudgets.length === 0 ? (
+                    {budgets.length === 0 ? (
                         <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
                             <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <h3 className="mt-4 text-lg font-medium text-gray-900">
-                                {activeStatus === 'all' ? 'Nenhum orçamento encontrado' : `Nenhum orçamento ${activeStatus.toLowerCase()}`}
+                                {`Nenhum orçamento ${activeStatus.toLowerCase()}`}
                             </h3>
                             <p className="mt-2 text-sm text-gray-500">
-                                {activeStatus === 'all'
-                                    ? 'Tente ajustar os filtros para ver mais resultados.'
-                                    : 'Não há orçamentos com este status no momento.'
-                                }
+                                Não há orçamentos com este status no momento.
                             </p>
                         </div>
                     ) : (
-                        <div className={`grid gap-6 ${activeStatus === 'all' ? 'grid-cols-3' : 'grid-cols-1'}`}>
-                            {filteredColumns.map((column) => (
-                                <div key={column.key} className="flex flex-col">
-                                    {/* Header da coluna */}
-                                    <div className={`rounded-t-lg border-2 p-4 mb-4 ${column.color}`}>
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="font-semibold text-gray-900">{column.title}</h3>
-                                            <span className="bg-white text-gray-600 text-sm font-medium px-2.5 py-0.5 rounded-full border">
-                                                {column.count}
-                                            </span>
-                                        </div>
-                                    </div>
-
+                        <div className="grid gap-6 grid-cols-1">
+                            {activeColumn && (
+                                <div className="flex flex-col">
                                     {/* Cards da coluna */}
                                     <div className="space-y-4 flex-1">
-                                        {budgetsByStatus[column.key].length === 0 ? (
-                                            <div className="bg-gray-50 rounded-lg border border-dashed border-gray-300 p-8 text-center">
-                                                <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                <p className="mt-2 text-sm text-gray-500">Nenhum orçamento</p>
-                                            </div>
-                                        ) : (
-                                            budgetsByStatus[column.key].map((bud) => (
-                                                <CardBudget
-                                                    key={bud.id_orcamento}
-                                                    index={bud.codigo}
-                                                    name={bud.car}
-                                                    services={bud.services.map(serv => serv.service).join(', ')}
-                                                    status={column.key}
-                                                    onClick={() => handleOpenBudget(bud)}
-                                                />
-                                            ))
-                                        )}
+                                        {budgets.map((bud) => (
+                                            <CardBudget
+                                                key={bud.id_orcamento}
+                                                index={bud.codigo}
+                                                name={bud.car}
+                                                services={bud.services.map(serv => serv.service).join(', ')}
+                                                status={bud.label_status}
+                                                concorrencia={bud.concorrencia}
+                                                onClick={() => handleOpenBudget(bud)}
+                                            />
+                                        ))}
                                     </div>
                                 </div>
-                            ))}
+                            )}
                         </div>
                     )}
                 </div>
@@ -487,23 +387,6 @@ export default function BudgetsPage({ }: BudgetsPageProps) {
                         {/* Conteúdo com scroll */}
                         <div className="p-6 overflow-y-auto max-h-[calc(100vh-140px)] lg:max-h-[calc(85vh-80px)]">
                             <div className="space-y-6">
-                                {/* Filtro de Status */}
-                                {/* <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                                        Status do orçamento
-                                    </label>
-                                    <select
-                                        value={status || ''}
-                                        onChange={(e) => setStatus(e.target.value ? Number(e.target.value) as 1 | 2 | 3 | 4 | 5 | 11 : undefined)}
-                                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
-                                    >
-                                        {statusOptions.map(option => (
-                                            <option key={option.value || 'all'} value={option.value || ''}>
-                                                {option.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div> */}
 
                                 {/* Filtro de Itens por Página */}
                                 <div>

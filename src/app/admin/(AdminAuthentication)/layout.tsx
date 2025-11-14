@@ -21,14 +21,7 @@ export default function AdminLayout(
             icon: <BanknotesIcon
             className="size-5 text-gray-500"
             />,
-            label: 'Orçamentos'
-        },
-        {
-            value: 'schedules',
-            icon: <CalendarIcon
-                className="size-5 text-gray-500"
-            />,
-            label: 'Agendamento'
+            label: 'Solicitações'
         },
         {
             value: 'schedule',
