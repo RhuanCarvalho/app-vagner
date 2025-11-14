@@ -58,6 +58,7 @@ interface Budget {
     company_image: string;
     options_dates: { date: string, periodo: string}[];
     type: string;
+    concorrencia: boolean;
 }
 
 interface DataRejectedBudget {
@@ -132,7 +133,8 @@ export const useBudgets = create<useBudgetsProps>((set, get) => ({
                             company_name: '', // Faltou essa informação
                             company_image: '', // Faltou essa informação
                             options_dates: budget.options_dates, 
-                            type: budget.type
+                            type: budget.type,
+                            concorrencia: budget.concorrencia
                         },
                         checkinData,
                     }
